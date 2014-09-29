@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="AIGS Commons" default="default" basedir=".">
+    <description>Builds, tests, and runs the project AIGS Commons</description>
+    <import file="nbproject/build-impl.xml"/>
+    <target  description="bundle sources in a jar" name="package-sources">
+                <jar basedir="src" destfile="dist/AIGS Commons_Sources.jar"/>
+    </target>
+    <target depends="-javadoc-build" description="bundle javadoc in a jar" name="package-doc">
+                <jar basedir="dist/javadoc" destfile="dist/AIGS Commons_JavaDoc.jar"/>
+    </target>	
+    
+</project>

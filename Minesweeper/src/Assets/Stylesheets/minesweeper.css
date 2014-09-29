@@ -1,0 +1,38 @@
+.root{
+     display: block;
+    -fx-background-color: #000000;
+}
+
+.minesweeperField{
+    -fx-stroke: white;
+    -fx-stroke-width: 1px;
+    -fx-background-size: 69, 69;
+    -fx-background-image: url("../Images/msbg2.png"); 
+    -fx-background-repeat: round;
+    -fx-background-position: center center; 
+}
+
+.empty{
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("../Images/msbg1.png"); 
+    -fx-background-repeat: round;
+    -fx-background-position: center center; 
+}
+
+
+.minesweeperField:hover{
+    -fx-effect: innershadow( three-pass-box , rgba(140,140,180,0.7) , 140, 0.0,0,0);
+    -fx-background-color: #222222;
+    -fx-background-repeat: round;
+    -fx-background-position: center center; 
+}
+
+.mineRed{
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("../Images/red.png"); 
+    -fx-background-repeat: round;
+    -fx-background-position: center center; 
+}
+

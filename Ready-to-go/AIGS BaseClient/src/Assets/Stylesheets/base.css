@@ -1,0 +1,113 @@
+.root{
+     display: block;
+    -fx-background-color: #7F7F7F;
+}
+
+#gameName{
+    -fx-font: 56pt "Aerovias Brasil NF";
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+#gameNameSmall{
+    -fx-font: 28pt "Aerovias Brasil NF";
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+#status{
+    -fx-font: 28pt "Aerovias Brasil NF";
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+#statusSmall{
+    -fx-font: 20pt "Aerovias Brasil NF";
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+.darkBackground{
+    -fx-background-image: url("/Assets/BasePatterns/grey_wash_wall.png");
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,0);
+}
+
+.semiDarkBackground{
+    -fx-background-image: url("/Assets/BasePatterns/gray_sand.png");
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,0);
+}
+
+.blackField{
+    -fx-background-color: #000000;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/black_paper.png"); 
+    -fx-effect: innershadow( three-pass-box , rgba(90,90,90,0.7) , 6, 0.0,2,0);
+
+}
+
+.blackField:hover{
+    -fx-background-color: #000000;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/black_paper.png"); 
+    -fx-opacity: 0.75;
+    -fx-effect: innershadow( three-pass-box , rgba(90,90,90,0.7) , 12, 0.0,2,0);
+
+}
+
+.whiteField{
+    -fx-background-color: #000000;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/white_paper.png");
+     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 12, 0.0,2,0);
+}
+
+.whiteField:hover{
+    -fx-background-color: #000000;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/white_paper.png");
+    -fx-opacity: 0.75;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,2);
+}
+
+.loading{
+    -fx-background-color: #ffffff;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/light_honeycomb.png");
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,2);
+}
+
+.loading{
+    -fx-background-color: #ffffff;
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/BasePatterns/light_honeycomb.png");
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,2);
+}
+
+#loadingLabel{
+    -fx-font: 56pt "Aerovias Brasil NF";
+
+    -fx-text-fill: #2d2d2d;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+#winningLabel{
+    -fx-font: 56pt "Aerovias Brasil NF";
+    -fx-text-fill: #2d2d2d;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+.settings{
+    -fx-base: #AAAAAA;
+    -fx-background-size: 26, 26;
+    -fx-background-image: url("/Assets/BasePatterns/settings.png");
+    -fx-stroke: gray;
+    -fx-background-position: center center;
+    -fx-background-repeat: round;
+}
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+
+  <xs:element name="IdentificationResponseMessage" type="identificationResponseMessage"/>
+
+  <xs:complexType name="identificationResponseMessage">
+    <xs:complexContent>
+      <xs:extension base="message">
+        <xs:sequence>
+          <xs:element name="IdentificationCode" type="xs:string" minOccurs="0"/>
+          <xs:element name="LoginSuccessful" type="xs:boolean"/>
+          <xs:element name="Reason" type="xs:string" minOccurs="0"/>
+          <xs:element name="UserName" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="message" abstract="true">
+    <xs:sequence>
+      <xs:element name="Player" type="player" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="FullyQualifiedClassName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="player">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

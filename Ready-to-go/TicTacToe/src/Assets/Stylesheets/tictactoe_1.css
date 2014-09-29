@@ -1,0 +1,19 @@
+
+.root{
+     display: block;
+    -fx-background-color: #7F7F7F;
+}
+
+.ticTacToeField{
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-background-image: url("/Assets/Images/white_paper.png"); 
+    -fx-effect: innershadow( three-pass-box , rgba(90,90,90,0.5) , 6, 0.0,2,0);
+
+}
+
+.ticTacToeField:hover{
+    -fx-effect: innershadow( three-pass-box , rgba(70,70,70,0.7) , 36, 0.0,0,0);
+
+}
+

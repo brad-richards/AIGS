@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+
+  <xs:element name="GameStartMessage" type="gameStartMessage"/>
+
+  <xs:complexType name="gameStartMessage">
+    <xs:complexContent>
+      <xs:extension base="message">
+        <xs:sequence>
+          <xs:element name="startingPlayer" type="player" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="message" abstract="true">
+    <xs:sequence>
+      <xs:element name="Player" type="player" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="FullyQualifiedClassName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="player">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

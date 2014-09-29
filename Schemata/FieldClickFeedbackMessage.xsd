@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+
+  <xs:element name="FieldClickFeedbackMessage" type="fieldClickFeedbackMessage"/>
+
+  <xs:complexType name="fieldClickFeedbackMessage">
+    <xs:complexContent>
+      <xs:extension base="message">
+        <xs:sequence>
+          <xs:element name="FieldStatus" type="fieldStatus" minOccurs="0"/>
+          <xs:element name="X" type="xs:int"/>
+          <xs:element name="Y" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="message" abstract="true">
+    <xs:sequence>
+      <xs:element name="Player" type="player" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="FullyQualifiedClassName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="player">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="fieldStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="Blocked"/>
+      <xs:enumeration value="NoChange"/>
+      <xs:enumeration value="Error"/>
+      <xs:enumeration value="Warning"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

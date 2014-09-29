@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configuration xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+    <GamelibsDirectory>./gamelibs</GamelibsDirectory>
+	<GameSourcesDirectory>./games</GameSourcesDirectory>
+    <HidesOnClose>false</HidesOnClose>
+    <IsCompactLoggingEnabled>false</IsCompactLoggingEnabled>
+    <IsConsoleMode>false</IsConsoleMode>
+    <IsMultiLoginAllowed>false</IsMultiLoginAllowed>
+    <IsXMLlogging>false</IsXMLlogging>
+    <KeepAliveTimeOut>10000</KeepAliveTimeOut>
+    <LogDirectory>./logs</LogDirectory>
+    <PortNumber>25123</PortNumber>
+    <UseKeepAliveManager>false</UseKeepAliveManager>
+    <WhatIsMyIpUrl>http://www.poebel.ch/aigs/ping.php</WhatIsMyIpUrl>
+</Configuration>

@@ -1,0 +1,38 @@
+/* 
+    Style-Definitionen für JavaFX-Fensterelemente
+    Created on : 16.08.2014, 13:33:51
+    Author     : Raphael Stoeckli
+*/
+
+/* Grund-Style */
+.root{
+     display: block;
+    -fx-background-color: #7F7F7F;
+}
+
+/* Style für Anzeige/Auswahl */
+.rockPaperScissorsField{
+    -fx-stroke: black;
+    -fx-stroke-width: 1px;
+    -fx-effect: innershadow( three-pass-box , rgba(90,90,90,0.5) , 6, 0.0,2,0);
+    
+}
+
+/* Style für aktuell selektiere Auswahl */
+.rockPaperScissorsFieldSelected{
+    -fx-stroke: white;
+    -fx-stroke-width: 10px;
+    -fx-effect: innershadow( three-pass-box , white , 12, 0.0,4,0);
+}
+
+/* Style für Namen und Punkteanzeige */
+.playerLabel{
+    -fx-font: 28pt "Aerovias Brasil NF";
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Style für Trenner zwischen Spielern */
+.separator {
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+}

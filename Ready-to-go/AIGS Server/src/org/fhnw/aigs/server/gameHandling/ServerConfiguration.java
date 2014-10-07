@@ -159,7 +159,7 @@ public class ServerConfiguration {
         boolean newMultiLoginAllowed = false;
         boolean newXMLlogging = false;
         boolean newHidesOnClose = false;
-        String newWhatIsMyIpUrl = "http://www.poebel.ch/aigs/ping.php"; // Alter default value if php script migrated to fhnw doamin (or similar)
+        String newWhatIsMyIpUrl = "http://icanhazip.com/"; // Alter default value if php script migrated to fhnw doamin (or similar)
         String newLogDirectory = "./logs";
         String newGamelibsDirectory = "./gamelibs";
         String newGameSourcesDirectory = "./games";

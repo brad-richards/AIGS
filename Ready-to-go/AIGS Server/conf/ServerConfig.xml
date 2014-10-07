@@ -11,5 +11,5 @@
     <LogDirectory>./logs</LogDirectory>
     <PortNumber>25123</PortNumber>
     <UseKeepAliveManager>false</UseKeepAliveManager>
-    <WhatIsMyIpUrl>http://www.poebel.ch/aigs/ping.php</WhatIsMyIpUrl>
+    <WhatIsMyIpUrl>http://icanhazip.com/</WhatIsMyIpUrl>
 </Configuration>

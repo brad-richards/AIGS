@@ -26,7 +26,7 @@ import org.apache.tools.ant.*;
  * collection.
  *
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.2 (Raphael Stoeckli, 07.10.2014)
  */
 public class GameLoader extends URLClassLoader {
 
@@ -71,6 +71,10 @@ public class GameLoader extends URLClassLoader {
     {
         ArrayList<String> games = new ArrayList<>();
         String gamelibsDirectory = ServerConfiguration.getInstance().getGamelibsDirectory();
+        if (GameLoader.checkFolderExists(gamelibsDirectory, true) == false)
+        {
+            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+        }
         File dir = new File(gamelibsDirectory);
         File[] files = dir.listFiles();
         int pos;
@@ -112,13 +116,18 @@ public class GameLoader extends URLClassLoader {
 
         // Load all jars in the gamelibs folder.
         // File jarFolder = new File("gamelibs"); // DEPRECATED
-        File jarFolder = new File(ServerConfiguration.getInstance().getGamelibsDirectory());
+        String gamelibsDirectory = ServerConfiguration.getInstance().getGamelibsDirectory();
+        if (GameLoader.checkFolderExists(gamelibsDirectory, true) == false)
+        {
+            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+        }
+        
+        File jarFolder = new File(gamelibsDirectory);
         File[] files = jarFolder.listFiles();
 
         URL gameJarURL = null;
         URL commonsJarURL = null;
         URL aigsCommonsURL = null;
-        String gamelibsDirectory = ServerConfiguration.getInstance().getGamelibsDirectory();
 
 
         /*
@@ -222,6 +231,53 @@ public class GameLoader extends URLClassLoader {
      */
     private GameLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
+    }
+    
+    /**
+     * Checks the existence of a folder
+     * @param path The path to be checked
+     * @param createEmptyFolder If true, a empty directory will be created, if the folder does not exist
+     * @since v1.2
+     * @return True, if the folder exists, false if not, respectively if the folder could not be created
+     */
+    public static boolean checkFolderExists(String path, boolean createEmptyFolder)
+    {
+        try
+        {
+            File f = new File(path);
+            if (f.exists())
+            {
+                if (f.isDirectory() == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The defined path '" + path + "' is not a folder");
+                    return false; //
+                }
+            }
+            else
+            {
+               if (createEmptyFolder == true)
+               {
+                   f.mkdir();
+                   Logger.getLogger(GameLoader.class.getName()).log(Level.INFO, "The folder '" + path + "' was created");
+                   return true;
+               }
+               else
+               {
+                   Logger.getLogger(GameLoader.class.getName()).log(Level.WARNING, "The folder '" + path + "' does not exist");
+                   return false;
+               }
+            }
+       
+        }
+        catch(Exception e)
+        {
+            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "There is a problem with the path '" + path + "' (does not exist)", e);
+            return false;
+        }
     }
     
 }

@@ -14,7 +14,7 @@ import org.fhnw.aigs.server.communication.ServerCommunication;
  * This class is responsible for console input when the server is run in
  * console mode.
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.2 (Raphael Stoeckli, 07.10.2014)
  */
 public class AIGSConsoleHandler {
     
@@ -162,6 +162,7 @@ public class AIGSConsoleHandler {
      */
     private void recompileClasses() {
         Logger.getLogger(AIGSConsoleHandler.class.getName()).log(Level.INFO, "Recompile and reload classes...");
+        new RecompileClassesAction().recompileClasses();
         new RecompileClassesAction().reloadClasses();
     }
 

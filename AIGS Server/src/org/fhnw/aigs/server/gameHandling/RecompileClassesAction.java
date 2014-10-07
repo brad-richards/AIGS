@@ -20,9 +20,11 @@ import org.fhnw.aigs.server.gui.ServerGUI;
  * them using several custom ant targets. Use this function whenever you changed
  * the game logic of your games. This method sends a ForceCloseMessage to all
  * clients and terminates all games.
- * v1.0 Origin Name 'ReloadClassesAction'
- * v1.1 Refactored to 'RecompileClassesAction'
- * @version 1.2 (Raphael Stoeckli, 11.09.2014)
+ * <br>v1.0 Origin Name 'ReloadClassesAction'
+ * <br>v1.1 Refactored to 'RecompileClassesAction'
+ * <br>v1.2 Bugfixes
+ * <br>v1.3 Added some error handling to the compiling process
+ * @version 1.3 (Raphael Stoeckli, 07.10.2014)
  */
 public class RecompileClassesAction implements ActionListener {
 
@@ -30,7 +32,7 @@ public class RecompileClassesAction implements ActionListener {
     private JList list;
     private boolean GUImode = false;
     
-    public RecompileClassesAction(Vector<String> content, JList list)
+    public RecompileClassesAction(Vector<String> content, JList list) // Button
     {
         this.content = content;
         this.list = list;
@@ -38,7 +40,7 @@ public class RecompileClassesAction implements ActionListener {
         actionPerformed(null);
     }
     
-    public RecompileClassesAction()
+    public RecompileClassesAction() // Console
     {
         this.GUImode = false;
         actionPerformed(null);
@@ -46,7 +48,10 @@ public class RecompileClassesAction implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e != null) // Only compile, if event raised from button, not at startup
+        {
         recompileClasses();
+        }
         if (this.GUImode == true)
         {
             reloadClasses();
@@ -60,7 +65,19 @@ public class RecompileClassesAction implements ActionListener {
      */
     public void recompileClasses(){
         
+        if (checkSetup() == false)
+        {
+            Logger.getLogger(RecompileClassesAction.class.getName()).log(Level.INFO, "Continue without compiling");
+            return; // Do not compile
+        }
+        
         String gamesDirectory = ServerConfiguration.getInstance().getGameSourcesDirectory();
+        
+        if (GameLoader.checkFolderExists(gamesDirectory, true) == false)
+        {
+            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The game source folder (games) could not be created. Check the server installation!");
+        }
+        
         File dir = new File(gamesDirectory);
         File[] files = dir.listFiles();
         if (files.length == 0)
@@ -107,6 +124,38 @@ public class RecompileClassesAction implements ActionListener {
             this.content.add(games.get(i));
         }
         this.list.setListData(this.content);        
+    }
+    
+    /**
+     * Checkt the setup of the AIGS server before compiling games
+     * @return True if the setup is OK for compiling, otherwise false
+     * @since v1.3
+     */
+    private boolean checkSetup()
+    {
+        boolean state = true;
+        String commonsPath = "../AIGS Commons";
+        if (GameLoader.checkFolderExists(commonsPath, false) == false)
+        {
+            Logger.getLogger(RecompileClassesAction.class.getName()).log(Level.WARNING, "The AIGS Commons project was not found at the position: '" + commonsPath + "'\nPlease check the setup...");
+            state = false;
+        }
+        String buildfilePath = "build.xml";
+        try
+        {
+            File f = new File(buildfilePath);
+            if (f.exists() == false)
+            {
+                Logger.getLogger(RecompileClassesAction.class.getName()).log(Level.WARNING, "The Ant script (build file) does not exist: '" + buildfilePath + "'\nPlease check the setup...");
+                state = false;
+            }
+        }
+        catch(Exception e)
+        {
+            Logger.getLogger(RecompileClassesAction.class.getName()).log(Level.WARNING, "An error occurred while checking the Ant script (build file): '" + buildfilePath + "'\nPlease check the setup...");
+            state = false;
+        }
+        return state;
     }
 
 }

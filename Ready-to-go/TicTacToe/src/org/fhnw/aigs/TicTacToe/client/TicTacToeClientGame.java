@@ -11,8 +11,11 @@ import org.fhnw.aigs.commons.communication.Message;
 import org.fhnw.aigs.commons.communication.PlayerChangedMessage;
 
 /**
- * The TicTacToe game on the client side.
- * @author Matthias Stöckli
+ * The TicTacToe game on the client side.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Minor changes
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.0.1
  */
 public class TicTacToeClientGame extends ClientGame {
 
@@ -30,6 +33,18 @@ public class TicTacToeClientGame extends ClientGame {
     public TicTacToeClientGame(String gameName, GameMode gameMode) {
         super(gameName, gameMode);
     }
+    
+    /**
+     * Create a new instance of TiCTacToeClientGame using the extended constructor
+     * of {@link ClientGame}.
+     * @param gameName The name of the game.
+     * @param gameMode The game mode.
+     * @param version The program version
+     * @since v1.0.1
+     */
+    public TicTacToeClientGame(String gameName, String version, GameMode gameMode) {
+        super(gameName, version, gameMode);
+    }    
 
     /**
      * Processing of the TicTacToeClient logic. The following actions are defined:

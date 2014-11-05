@@ -12,6 +12,7 @@ import org.fhnw.aigs.commons.communication.ClientClosedMessage;
  * will remove the game from the list of active games.
  *
  * @author Matthias Stöckli
+ * @version 1.0
  */
 class ClientShutdownCleanUp implements Runnable {
 

@@ -14,7 +14,7 @@ import javafx.scene.text.TextAlignment;
  * This screen can be used to inform the user about the fact that there is
  * either no player to join the game with or that the connection has not been
  * established yet.
- *
+ * @version v1.0
  * @author Matthias Stöckli
  */
 public class LoadingWindow extends BorderPane {

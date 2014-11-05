@@ -12,6 +12,7 @@ import org.fhnw.aigs.TicTacToeSwing.commons.TicTacToeSymbol;
 /**
  * A simple {@link javax.swing.JPanel } which can contain a cross or a nought symbol.
  * @author Matthias Stöckli 
+ * @version v1.0
  */
 public class TicTacToePane extends JPanel{
     

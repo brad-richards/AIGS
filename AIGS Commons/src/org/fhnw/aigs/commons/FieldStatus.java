@@ -6,6 +6,7 @@ package org.fhnw.aigs.commons;
  * message {@link org.fhnw.aigs.commons.communication.FieldClickFeedbackMessage} makes use of FieldStatus.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public enum FieldStatus {
 

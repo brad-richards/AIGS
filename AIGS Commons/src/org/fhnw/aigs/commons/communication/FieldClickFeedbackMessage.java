@@ -15,6 +15,7 @@ import org.fhnw.aigs.commons.FieldStatus;
  * logic purposes.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "FieldClickFeedbackMessage")
 public class FieldClickFeedbackMessage extends Message {

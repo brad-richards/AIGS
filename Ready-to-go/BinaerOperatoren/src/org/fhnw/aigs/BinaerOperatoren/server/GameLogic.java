@@ -10,6 +10,11 @@ import org.fhnw.aigs.commons.Player;
 import org.fhnw.aigs.commons.communication.GameEndsMessage;
 import org.fhnw.aigs.commons.communication.Message;
 
+/**
+ * This class represents the game logic part of BinaerOperatoren
+ * @author Matthias Stöckli
+ * @version v1.0
+ */
 public class GameLogic extends Game {
     
     /** A random number generator */
@@ -28,7 +33,7 @@ public class GameLogic extends Game {
      * Don't forgett to set the same game name in the class {@link org.fhnw.aigs.BinaerOperatoren.client.Main} in the package 'client'.
      */     
     public GameLogic(){
-        super("BinaerOperatoren", 1);
+        super("BinaerOperatoren", "v1.1", 1); // Name, version and number of players
     }
     
     @Override

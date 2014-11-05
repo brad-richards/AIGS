@@ -12,6 +12,7 @@ import org.fhnw.aigs.RockPaperScissors.commons.RockPaperScissorsSymbol;
  * Entweder nur als Anzeige (des Gegners) oder zum anklicken (eigene Felder).<br>
  * Abgeleitet von Pane, kann in GridPane eingebunden werden.
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 public class RockPaperScissorsBoardPane extends Pane{
     

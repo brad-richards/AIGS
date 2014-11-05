@@ -17,13 +17,18 @@ import org.fhnw.aigs.commons.communication.Message;
  * This is the class representing the TicTacToe board.
  * It contains 3 x 3 TicTacToePanes.
  * All event handlers and animations as well as the creation of the TicTacToePanes
- * occurs here.
- * @author Matthias Stöckli
+ * occurs here.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Changed Handling (integration of setFields() and SetEventHandler() into constructor)
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1
  */
 public class TicTacToeBoard extends BaseBoard{
      
     public TicTacToeBoard(int x, int y, ClientGame clientGame){
         super(x, y, clientGame);
+        this.setFields();
+        this.setEventHandlers();
     }
     
     /**

@@ -12,6 +12,7 @@ import javafx.scene.text.TextAlignment;
  * {@link BaseGameWindow#setOverlay(javafx.scene.Node)} method.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class GameEndWindow extends BorderPane {
 

@@ -1,9 +1,6 @@
 package org.fhnw.aigs.BinaerOperatoren.client;
 
 import org.fhnw.aigs.swingClient.GUI.BaseGameWindow;
-import org.fhnw.aigs.swingClient.GUI.LoadingWindow;
-import org.fhnw.aigs.swingClient.communication.ClientCommunication;
-import org.fhnw.aigs.swingClient.communication.Settings;
 
 
 /**
@@ -14,25 +11,13 @@ import org.fhnw.aigs.swingClient.communication.Settings;
  * @version 1.1 (Raphael Stoeckli, 13.08.2014)
  */
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args)
+    {
         BinaerOperatorenClientGame binaerOperatorenClientGame = new BinaerOperatorenClientGame("BinaerOperatoren"); // VERY IMPORTANT! The game name must be unique on the server (only onece 'BinaerOperatoren')
-        BaseGameWindow baseGameWindow = new BaseGameWindow("Binäroperatoren");
-        baseGameWindow.setContent(new LoadingWindow());
-        binaerOperatorenClientGame.setGameWindow(baseGameWindow);
-
-        
+        BaseGameWindow baseGameWindow = new BaseGameWindow("Binäroperatoren");  // Definition of the board
+        binaerOperatorenClientGame.setGameWindow(baseGameWindow);               // Set of BaseGameWindow
         BinaerOperatorenPanel binaerOperatorenPanel = new BinaerOperatorenPanel(binaerOperatorenClientGame);
-        binaerOperatorenClientGame.addPanel(binaerOperatorenPanel);
-        
-        Settings.tryLoadSettings(true);
-        
-        // Start the communication
-        ClientCommunication.setCredentials(binaerOperatorenClientGame, Settings.getInstance().getServerAddress(), Settings.getInstance().getServerPort());
-        // ClientCommunication.setCredentialsUsingOnlineConfiguration(binaerOperatorenClientGame);  // DEPRECATED, respectively: to redefine
-        
-        Thread clientCommunicationThread = new Thread(ClientCommunication.getInstance());
-        clientCommunicationThread.setName("ClientCommunicationThread");
-        clientCommunicationThread.start();
-        baseGameWindow.setVisible(true);
+        binaerOperatorenClientGame.addPanel(binaerOperatorenPanel);             
+        baseGameWindow.initGame(binaerOperatorenClientGame);                     // Initialize the game
     }
 }

@@ -5,12 +5,12 @@ import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 /**
  * This screen can be used to inform the user about the fact that no game 
  * has yet been established.
+ * @version v1.0
  * @author Matthias Stöckli
  */
 public class LoadingWindow extends BackgroundPanel{

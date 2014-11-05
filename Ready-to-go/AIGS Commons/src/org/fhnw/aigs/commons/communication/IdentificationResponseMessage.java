@@ -5,21 +5,28 @@ import javax.xml.bind.annotation.*;
 /**
  * This message is sent to the client as a reply to a
  * {@link IdentificationMessage}. It contains details about the success of the
- * log in process.
+ * log in process.<br>
+ * v1.0 Initial release<br>
+ * v1.1 added login name (split up of name into display and login name)
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 23.10.2014)
  */
 @XmlRootElement(name = "IdentificationResponseMessage")
 public class IdentificationResponseMessage extends Message {
 
     /**
-     * The definite user name which will be used by the client and the server
+     * The definite login name if login is enabled on the server
      */
-    private String userName;
+    private String loginName; 
     /**
-     * The identification code sent by the client
+     * The displayed player name
      */
-    private String identificationCode;
+    private String playerName;
+    /**
+     * The password sent by the client
+     */
+    private String password;
     /**
      * The reason (if there is any) why the log in process failed
      */
@@ -37,19 +44,18 @@ public class IdentificationResponseMessage extends Message {
 
     /**
      * Creates a new instance of IdentificationResponseMessage. This will set
-     * the user's name, the identificationCode, the failing reason (if there is
-     * any).
+     * the user's name, the password, the failing reason (if there is any).
      *
-     * @param userName The user's definite name (may be different from the
-     * proposed one)
-     * @param identificationCode The user's identification code.
+     * @param loginName The user's login name
+     * @param playerName The user's displayed name 
+     * @param password The user's password.
      * @param reason The reason why the log in failed (can be null)
-     * @param loginSuccessful Flag that shows whether the login was successful
-     * or not
+     * @param loginSuccessful Flag that shows whether the login was successful or not
      */
-    public IdentificationResponseMessage(String userName, String identificationCode, String reason, boolean loginSuccessful) {
-        this.userName = userName;
-        this.identificationCode = identificationCode;
+    public IdentificationResponseMessage(String loginName, String playerName, String password, String reason, boolean loginSuccessful) {
+        this.loginName = loginName;
+        this.playerName = playerName;
+        this.password = password;
         this.reason = reason;
         this.loginSuccessful = loginSuccessful;
     }
@@ -71,19 +77,27 @@ public class IdentificationResponseMessage extends Message {
     }
 
     /**
-     * See {@link IdentificationResponseMessage#userName}.
+     * See {@link IdentificationResponseMessage#loginName}.
      */
-    @XmlElement(name = "UserName")
-    public String getUserName() {
-        return userName;
+    @XmlElement(name = "LoginName")
+    public String getLoginName() {
+        return loginName;
     }
+    
+    /**
+     * See {@link IdentificationResponseMessage#playerName}.
+     */
+    @XmlElement(name = "PlayerName")
+    public String getPlayerName() {
+        return playerName;
+    }    
 
     /**
-     * See {@link IdentificationResponseMessage#identificationCode}.
+     * See {@link IdentificationResponseMessage#password}.
      */
-    @XmlElement(name = "IdentificationCode")
-    public String getIdentificationCode() {
-        return identificationCode;
+    @XmlElement(name = "Password")
+    public String getPassword() {
+        return password;
     }
 
     /**
@@ -94,11 +108,18 @@ public class IdentificationResponseMessage extends Message {
     }
 
     /**
-     * See {@link IdentificationResponseMessage#userName}.
+     * See {@link IdentificationResponseMessage#loginName}.
      */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
+    
+    /**
+     * See {@link IdentificationResponseMessage#playerName}.
+     */
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }    
 
     /**
      * See {@link IdentificationResponseMessage#reason}.
@@ -108,9 +129,9 @@ public class IdentificationResponseMessage extends Message {
     }
 
     /**
-     * See {@link IdentificationResponseMessage#identificationCode}.
+     * See {@link IdentificationResponseMessage#password}.
      */
-    public void setIdentificationCode(String identificationCode) {
-        this.identificationCode = identificationCode;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

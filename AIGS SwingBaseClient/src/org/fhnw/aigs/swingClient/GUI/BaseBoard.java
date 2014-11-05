@@ -18,6 +18,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * abstract class.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public abstract class BaseBoard extends JPanel {
 

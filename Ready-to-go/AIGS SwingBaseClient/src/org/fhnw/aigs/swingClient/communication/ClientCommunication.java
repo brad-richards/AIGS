@@ -1,9 +1,6 @@
 package org.fhnw.aigs.swingClient.communication;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -21,9 +18,13 @@ import org.fhnw.aigs.commons.communication.IdentificationResponseMessage;
  * This class is responsible for everything related to the network communication
  * to the server. Due to the fact that the class uses the Singleton Pattern, it
  * is not possible to instantiate ClientCommunication directly. In order to get
- * to an instance, use <b>getInstance()</b> instead.
- *
- * @author Matthias Stöckli
+ * to an instance, use <b>getInstance()</b> instead.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.1.1 Minor changes due to changes in other clssses (dependencies)
+ * 
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public class ClientCommunication implements Runnable {
 
@@ -32,30 +33,27 @@ public class ClientCommunication implements Runnable {
      * be an integer between 0 and 65535.
      */
     private int port;
-
     /**
      * The host address. This is usually the external IP address of the server
      * or, if developping locally, "localhost".
      */
     private String host;
-
     /**
      * The Socket, i.e. the connection to the server.
      */
     private Socket socket;
-
     /**
      * A flag which indicates whether a connection has been established.
      */
     public static boolean isConnected;
-
+    
     /**
      * A flag which indicates whether the client communication has been set
      * using the online configuration file. See
      * {@link ClientCommunication#setCredentialsUsingOnlineConfiguration}.
      */
-   // public static boolean hasReadFromFile;
-
+    //public static boolean hasReadFromFile;
+    
     /**
      * The client game which will be used to initialize the
      * {@link ClientMessageBroker}.
@@ -82,6 +80,7 @@ public class ClientCommunication implements Runnable {
      * Provides a container for the ServerCommunication singleton
      */
     private static final class ClientCommunicationHolder {
+
         private static final ClientCommunication INSTANCE = new ClientCommunication();
     }
 
@@ -160,7 +159,7 @@ public class ClientCommunication implements Runnable {
     }
 
     /**
-     * This is an alternative for the {@link ClientCommunication#setCredentials(org.fhnw.aigs.swingClient.gameHandling.ClientGame, java.lang.String, int)} 
+     * This is an alternative for the {@link ClientCommunication#setCredentials(org.fhnw.aigs.client.gameHandling.ClientGame, java.lang.String, int) }
      * This method downloads the credentials (port and address) from a
      * predefined, permanent url. This should make sure that the port and host
      * are always up to date
@@ -168,7 +167,6 @@ public class ClientCommunication implements Runnable {
      * @param clientGame The ClientGame instance
      */
     public static void setCredentialsUsingOnlineConfiguration(ClientGame clientGame) {
-
         // CHANGE TO THE ACTUAL LOCATION OF THE FILE CONTAINING THE STANDARD CREDENTIALS.
         String urlString = "http://www.poebel.ch/aigs/aigs.txt";
         ClientCommunication instance = getInstance();
@@ -218,7 +216,7 @@ public class ClientCommunication implements Runnable {
      * successfully established, a new message loop will be started.
      *
      */
-    private void establishConnection() {
+    private void establishConnection() {       
         do {
             try {
                 // Open a new socket to the specified host/port.
@@ -264,11 +262,10 @@ public class ClientCommunication implements Runnable {
     }
 
     /**
-     * this method will search for a file called "aigs.user" and read it.<br>
-     * The mechanism behind this are very simple: The file will be read with a
-     * InputStreamReader and the first two lines will be interpreted as user
-     * name (first line) and identification code (second line).<br>
-     * The content of the file will be sent as an identification to the server
+     * This method looks whether an instance of the Setting class existing.
+     * If not available, the settings window will be showed.<br>
+     * The user name and identifivcation stored in the settings will be
+     * sent as an identification to the server
      * via a {@link IdentificationMessage}.<br>
      * If the name and the identification code match and the user is currently
      * not logged in the system, the identification is successful. The server
@@ -276,50 +273,18 @@ public class ClientCommunication implements Runnable {
      * the client about success of failure of the log-in attempt. <br>
      * If the log in failed, the {@link SettingsWindow} will be shown to the
      * user.
-     */
-   /*
-    private void checkIdentity() {
-        // Check whether there is a "aigs.user" file
-        // if so, try to log in with the credentials given
-        File userFile = new File("aigs.user");
-        if (userFile.exists()) {
-            String userName = "";
-            String identificationCode = "";
-            InputStreamReader inputStreamReader;
-            try {
-                inputStreamReader = new FileReader(userFile);
-                BufferedReader reader = new BufferedReader(inputStreamReader);
-                userName = reader.readLine();                                   // The first line is the user name
-                identificationCode = reader.readLine();                         // The second line is the identification code
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(ClientCommunication.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(ClientCommunication.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            // Send an IdentificationMessage containing the credentials
-            IdentificationMessage identificationMessage = new IdentificationMessage(userName, identificationCode);
-            identificationMessage.send(socket, null);
-            hasReadFromFile = true;
-        } else {
-            // Ask for user input via SettingsWindow window
-            SettingsWindow identificationGUI = new SettingsWindow(clientGame);
-            identificationGUI.setVisible(true);
-        }
-
-    }
-    */
-private void checkIdentity() 
+     */  
+    private void checkIdentity() 
     {
         if (Settings.getInstance().isInitialized() == false)
         {
             Settings.tryLoadSettings(true); // Opens the settings window if no settings available
         }
             // Sends an identification to the Server over the new connection
-            IdentificationMessage identificationMessage = new IdentificationMessage(Settings.getInstance().getUsername(), Settings.getInstance().getIdentificationCode());
+            IdentificationMessage identificationMessage = new IdentificationMessage(Settings.getInstance().getUsername(), Settings.getInstance().getPassword(),Settings.getInstance().getDisplayname());
+            
             clientGame.sendMessageToServer(identificationMessage);
             Logger.getLogger(ClientCommunication.class.getName()).log(Level.INFO, "Sent identification!");        
 
-    }    
-    
+    }
 }

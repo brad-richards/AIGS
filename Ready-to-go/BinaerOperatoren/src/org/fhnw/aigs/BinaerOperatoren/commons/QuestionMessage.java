@@ -7,6 +7,7 @@ import org.fhnw.aigs.commons.communication.Message;
 /**
  * This message is used to send a question to the client.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "QuestionMessage")
 public class QuestionMessage extends Message{

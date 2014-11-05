@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -13,10 +14,12 @@ import javafx.scene.text.Font;
 /**
  * Provides a simple header for the GameWindow. It shows the title of the game
  * and a status which can be defined with the method
- * {@link BaseHeader#setStatusLabelText(java.lang.String)}.
- *
+ * {@link BaseHeader#setStatusLabelText(java.lang.String)}.<br>
+ * v1.0 Initial Release<br>
+ * v1.1 Changes of teh UI
+ * v1.1.1 Minor changes of the UI (tool tips)
  * @author Matthias Stöckli (v1.0)
- * @version v1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version v1.1.1 (Raphael Stoeckli, 23.10.2014)
  */
 public class BaseHeader extends GridPane {
 
@@ -34,6 +37,8 @@ public class BaseHeader extends GridPane {
         statusLabel = new Label();
         settingsButton = new Button();
         settingsButton.getStyleClass().add("settings"); // Refernce to CSS (Icon also in CSS)
+        settingsButton.setTooltip(new Tooltip("Opens the settings window"));
+        settingsButton.getTooltip().getStyleClass().add("loadingTooltip");            
         settingsButton.setPrefSize(28, 28);
         settingsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -77,14 +82,6 @@ public class BaseHeader extends GridPane {
         
         
     }
-    /*
-    private double measureString(String text, int Fontsize, Font font)
-    {
-        Text txt = new Text(text);
-        txt.setStyle("");
-    }
-    */
-
     /**
      * Allows to set the text of the title label.
      *

@@ -1,10 +1,12 @@
 package org.fhnw.aigs.swingClient.GUI;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.fhnw.aigs.commons.GameMode;
+import org.fhnw.aigs.swingClient.communication.Settings;
+import org.fhnw.aigs.swingClient.gameHandling.ClientGame;
 
 
 /**
@@ -16,9 +18,12 @@ import javax.swing.JPanel;
  * <li>In the middle there is the actual content, the game itself. This will
  * take up 85 percent of the space. The content can be accessed via
  * {@link BaseGameWindow#getContent}.</li>
- * </ul>
+ * </ul><br>
+ * v1.0 Initial release<br>
+ * v1.1 Change of handling and UI improvements
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public class BaseGameWindow extends JFrame {
 
@@ -40,6 +45,10 @@ public class BaseGameWindow extends JFrame {
 
     private final BackgroundPanel contentPanel;
         
+    /**
+     * The title of the Window
+     */
+    private String title;    
 
     /**
      * Creates a new BaseGameWindow.
@@ -48,6 +57,7 @@ public class BaseGameWindow extends JFrame {
      */
     public BaseGameWindow(String title) {
         super(title);
+        this.title = title;
 
         // A small hack to get a frame with an actual content size of 800, see
         // http://stackoverflow.com/questions/2451252/swing-set-jframe-content-area-size
@@ -136,5 +146,52 @@ public class BaseGameWindow extends JFrame {
         }
 
     }
+    
+    /**
+     * Initializes the game.<br>
+     * This method will call the settings window if no settings are defined or
+     * if the window is configured to be visible at every startup.<br>
+     * Depending on the settings, the setup window or the loading window 
+     * will be enabled. An auomatic connection will be established in case
+     * of the loading window. Call this method in the <b>main()</b> method of your game 
+     * (in Main.java or a similar calss containing the main method)
+     * @param content The main pane of the game. This parameter is unused (only for compatibility reason)
+     * @param clientGame The client game object of the game
+     * @since v1.1
+     * @deprecated You can use directly {@link BaseGameWindow#initGame(org.fhnw.aigs.swingClient.gameHandling.ClientGame)}
+     */
+    public void initGame(JPanel content, ClientGame clientGame)
+    {
+        initGame(clientGame);                                                   // Call the actual method
+    }
+    
+    /**
+     * Initializes the game.<br>
+     * This method will call the settings window if no settings are defined or
+     * if the window is configured to be visible at every startup.<br>
+     * Depending on the settings, the setup window or the loading window 
+     * will be enabled. An auomatic connection will be established in case
+     * of the loading window. Call this method in the <b>main()</b> method of your game 
+     * (in Main.java or a similar calss containing the main method)
+     * @param clientGame The client game object of the game
+     * @since v1.1
+     */
+    public void initGame(ClientGame clientGame)
+    {
+        Settings.tryLoadSettings(true);                                         // Open Settings window, if defined
+        if (clientGame.getGameMode() == GameMode.SinglePlayer || Settings.getInstance().getAutoConnect() == true)
+        {
+            SetupWindow dummy = new SetupWindow(clientGame);                    // Will only create a waiting screen, because no setup is needed
+                                                                                // The dummy instance will automatically load the waiting screen (no need to use setContent)
+        }
+        else
+        {
+            this.setContent(new SetupWindow(clientGame));                       // Will create a setup screen
+        }
+        if (clientGame.getVersionString() != null)
+        {
+            this.setTitle(this.title + " " + clientGame.getVersionString());
+        }
+    }    
 
 }

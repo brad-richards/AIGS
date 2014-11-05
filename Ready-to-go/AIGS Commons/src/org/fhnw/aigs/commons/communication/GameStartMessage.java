@@ -10,6 +10,7 @@ import org.fhnw.aigs.commons.Player;
  * Additionally the "startingPlayer" indicates who is going to start the game.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "GameStartMessage")
 public class GameStartMessage extends Message {

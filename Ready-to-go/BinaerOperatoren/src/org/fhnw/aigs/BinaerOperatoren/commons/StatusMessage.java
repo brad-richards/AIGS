@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * This message informs the client about the status of an answer, i.e.
  * whether the answer was correct or wrong. 
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "StatusMessage")
 public class StatusMessage extends Message {

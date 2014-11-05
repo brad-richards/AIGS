@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
  * http://stackoverflow.com/questions/10785560/write-logger-message-to-file-and-textarea-while-maintaining-default-behaviour-in
  *
  * @author Matthias Stöckli, Edwin Dalorzo
+ * @version v1.0
  */
 public class LoggerTextAreaHandler extends java.util.logging.Handler {
 

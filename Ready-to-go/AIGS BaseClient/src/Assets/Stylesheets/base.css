@@ -81,20 +81,41 @@
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,2);
 }
 
-.loading{
-    -fx-background-color: #ffffff;
-    -fx-stroke: black;
-    -fx-stroke-width: 1px;
-    -fx-background-image: url("/Assets/BasePatterns/light_honeycomb.png");
-    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0,2,2);
+.loadingTextField{
+    -fx-font: 20pt "Aerovias Brasil NF";
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+.loadingLabelSmall{
+    -fx-font: 26pt "Aerovias Brasil NF";
+    -fx-text-fill: #2d2d2d;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+.loadingButton{
+    -fx-font: 26pt "Aerovias Brasil NF";
+    -fx-text-fill: #2d2d2d;
+   /* -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);*/
+}
+
+.loadingTooltip{
+    -fx-font: 12pt "Aerovias Brasil NF";
+    -fx-text-fill: #2d2d2d;
+    -fx-background-color: #FFFFFF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
+}
+
+.loadingCheckBox{
+    -fx-font: 18pt "Aerovias Brasil NF";
+    -fx-text-fill: #2d2d2d;
 }
 
 #loadingLabel{
     -fx-font: 56pt "Aerovias Brasil NF";
-
     -fx-text-fill: #2d2d2d;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 2, 0.0,2,0);
 }
+
 
 #winningLabel{
     -fx-font: 56pt "Aerovias Brasil NF";

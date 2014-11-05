@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.*;
  * not recommended to use these messages, unless really needed.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "KeepAliveMessage")
 public class KeepAliveMessage extends Message {

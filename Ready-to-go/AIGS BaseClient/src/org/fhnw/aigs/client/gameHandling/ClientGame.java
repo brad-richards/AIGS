@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.fhnw.aigs.client.GUI.BaseGameWindow;
 import org.fhnw.aigs.client.communication.ClientMessageBroker;
 import org.fhnw.aigs.commons.GameMode;
+import org.fhnw.aigs.commons.JoinType;
 import org.fhnw.aigs.commons.Player;
 import org.fhnw.aigs.commons.communication.JoinMessage;
 import org.fhnw.aigs.commons.communication.Message;
@@ -19,9 +20,12 @@ import org.fhnw.aigs.commons.communication.Message;
  * merely a container class that contains all important facts of a game:<br>
  * The game name, a reference to the player, the gameMode and a reference to the
  * current "BaseGameWindow". The latter allows the game to manipulate the GUI
- * directly when using the standard AIGS BaseClient.
+ * directly when using the standard AIGS BaseClient.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes, additional properties
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public abstract class ClientGame {
 
@@ -30,6 +34,17 @@ public abstract class ClientGame {
      * package name!
      */
     protected String gameName;
+    
+    /**
+     * The name of the Party
+     */
+    protected String partyName;
+    
+    /**
+     * The type of starting the game respectively to join in a existing game
+     */
+    protected JoinType joinType;
+    
     /**
      * A reference to the player, this will usually be set by the
      * ClientMessageBroker in the course of the identification process. Once the
@@ -43,6 +58,8 @@ public abstract class ClientGame {
      * "startGameWith" on the client side.
      */
     protected GameMode gameMode;
+    
+    
     /**
      * The BaseGameWindow holds a reference to the gameWindow. This class is
      * used in the standard JavaFX based AIGS BaseClient for showing the GUI. It
@@ -56,6 +73,13 @@ public abstract class ClientGame {
      * Indicates whether the game is still running or not
      */
     protected boolean noInteractionAllowed;
+    
+    
+    /**
+     * Indicates a (optional) version number of the game. Use this for better version control of games on the server/client
+     */
+    protected String versionString;
+    
 
     /**
      * See {@link ClientGame#gameWindow}
@@ -69,6 +93,21 @@ public abstract class ClientGame {
      */
     public String getGameName() {
         return gameName;
+    }
+    
+     /**
+     * See {@link ClientGame#joinType}
+     */      
+    public JoinType getJoinType() {
+        return joinType;
+    }
+    
+     /**
+     * See {@link ClientGame#partyName}
+     */  
+    public String getPartyName()
+    {
+        return partyName;
     }
 
     /**
@@ -84,13 +123,20 @@ public abstract class ClientGame {
     public GameMode getGameMode() {
         return gameMode;
     }
-
+    
     /**
      * * See {@link ClientGame#noInteractionAllowed}
      */
     public boolean isNoInteractionAllowed() {
         return noInteractionAllowed;
     }
+    
+    /**
+     * See {@link ClientGame#versionString}.
+     */        
+    public String getVersionString() {
+        return versionString;
+    }       
 
     /**
      * See {@link ClientGame#player}
@@ -106,6 +152,20 @@ public abstract class ClientGame {
     public void setGameName(String gameName) {
         this.gameName = gameName;
     }
+    
+    /**
+     * See {@link ClientGame#partyName}
+     */    
+    public void setPartyName(String partyName){
+        this.partyName = partyName;
+    }
+    
+    /**
+     * See {@link ClientGame#joinType}
+     */     
+    public void setJoinType(JoinType joinType) {
+        this.joinType = joinType;
+    }    
 
     /**
      * See {@link ClientGame#gameWindow}
@@ -127,6 +187,13 @@ public abstract class ClientGame {
     public void setNoInteractionAllowed(boolean noInteractionAllowed) {
         this.noInteractionAllowed = noInteractionAllowed;
     }
+    
+    /**
+    * See {@link ClientGame#versionString}.
+    */ 
+    public void setVersionString(String versionString) {
+        this.versionString = versionString;
+    }    
 
     /**
      * Creates a new instance of a ClientGame with the specified name and a
@@ -140,15 +207,37 @@ public abstract class ClientGame {
         setUpLogging();                                     // Start Logging
         this.gameName = gameName;
         this.gameMode = mode;
+        this.joinType = JoinType.Auto;                      // Default
 
         Thread shutdownCleanUpThread = new Thread(new ClientShutdownCleanUp());
         shutdownCleanUpThread.setName("ShutdownCleanUpThread");
         Runtime.getRuntime().addShutdownHook(shutdownCleanUpThread);
     }
+    
+    /**
+     * Creates a new instance of a ClientGame with the specified name, version and
+     * gameMode. This constructor will set up the Shutdown hook which takes care
+     * of the house keeping like sending RoceCloseMessages upon termination.
+     *
+     * @param gameName The game's name, e.g. TicTacToe
+     * @param mode The game mode, e.g. SinglePlayer
+     * @param version The version of the game
+     */
+    public ClientGame(String gameName, String version, GameMode mode) {
+        setUpLogging();                                     // Start Logging
+        this.gameName = gameName;
+        this.gameMode = mode;
+        this.versionString = version;
+        this.joinType = JoinType.Auto;                      // Default
+
+        Thread shutdownCleanUpThread = new Thread(new ClientShutdownCleanUp());
+        shutdownCleanUpThread.setName("ShutdownCleanUpThread");
+        Runtime.getRuntime().addShutdownHook(shutdownCleanUpThread);
+    }    
 
     /**
      * Creates a new instance of a ClientGame with the specified name. This
-     * constructor does not specify a game mode. It can be used when there is no
+     * constructor does not specify a game mode or version. It can be used when there is no
      * need for a game mode. The GameMode will then be set to SinglePlayer which
      * will have no effect on the game as long as not specifically implemente in
      * the game logic.
@@ -204,14 +293,23 @@ public abstract class ClientGame {
     }
 
     /**
-     * Initializes the game on the server side by sending a JoinMessage. The
-     * server will then try to connect the player to the first available game of
-     * the same type. The JoinMessage will contain the name of the game and the
-     * game mode.
+     * Initializes the game on the server side by sending a JoinMessage. 
+     * The Server will decide whether to create or join a game depending on 
+     * the defined join type. The JoinMessage will contain the name of the game,
+     * the join type and the game mode.<br>
+     * This method will be called in {@link ClientGame#onGameReady()}
      */
     public void startGame() {
-        JoinMessage joinMessage = new JoinMessage(gameName, gameMode);
-        sendMessageToServer(joinMessage);
+        JoinMessage joinMessage = null;
+        if (this.joinType == JoinType.Auto)
+        {
+            joinMessage = new JoinMessage(gameName, gameMode, JoinType.Auto);
+        }
+        else
+        {
+            joinMessage = new  JoinMessage(gameName, gameMode, partyName, this.joinType);
+        }
+        sendMessageToServer(joinMessage);     
     }
 
     /**
@@ -229,11 +327,11 @@ public abstract class ClientGame {
             System.exit(0);
         }
         if (gameMode == GameMode.SinglePlayer) {
-            Logger.getLogger(ClientGame.class.getName()).log(Level.SEVERE, "You cannot use 'startGameAsNamedPArty' if you want to play "
+            Logger.getLogger(ClientGame.class.getName()).log(Level.SEVERE, "You cannot use 'startGameAsNamedParty' if you want to play "
                     + "in single player mode.");
             System.exit(0);
         }
-        JoinMessage joinMessage = new JoinMessage(gameName, gameMode, partyName);
+        JoinMessage joinMessage = new JoinMessage(gameName, gameMode, partyName, JoinType.JoinParticularGame);
         sendMessageToServer(joinMessage);
     }
 

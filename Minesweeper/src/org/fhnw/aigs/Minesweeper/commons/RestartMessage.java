@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * empty message. in Minesweeper there is no need for any attributes.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "RestartMessage")
 public class RestartMessage extends Message {

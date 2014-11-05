@@ -5,9 +5,22 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * A simple screen which can be shown, when the winning conditions have been
+ * met. The easiest way to achieve this would be to use the
+ * {@link BaseGameWindow#setContent(javax.swing.JPanel)} method.
+ *
+ * @author Matthias Stöckli
+ * @version v1.0
+ */
 public class GameEndWindow extends JPanel{
 
-
+    /**
+     * Create a new instance of the GameEndWindow and create a label based on
+     * the winner's name.
+     *
+     * @param winner The winner of the game.
+     */
     public GameEndWindow(String winner) {        
         this.setLayout(null);
         

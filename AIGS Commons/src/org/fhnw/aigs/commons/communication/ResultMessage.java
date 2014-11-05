@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.FieldStatus;
  * contains a turn statatus, e.g. "OK", "BLOCKED" etc.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "ResultMessage")
 public class ResultMessage extends Message {

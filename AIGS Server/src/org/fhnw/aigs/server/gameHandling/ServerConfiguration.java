@@ -7,16 +7,30 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Due to the fact that the class uses the Singleton Pattern, it is not possible to instantiate
- * ClientCommunication directly. In order to get to an instance, use <b>getInstance()</b> instead.
+ * ClientCommunication directly. In order to get to an instance, use <b>getInstance()</b> instead.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.2 Features added and default values changed
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 31.07.2014)
+ * @version 1.2 (Raphael Stoeckli, 14.10.2014)
  */
 @XmlRootElement(name="Configuration")
 public class ServerConfiguration {
 
+    /**
+     * The temporary logs directory after changing the actual directory.<br>
+     * The location can only be changed with a restart of the server.<br>
+     * For handling purpose the old value has to be preserved in this 
+     * parameter until restart. Will not be marshalled
+     * @since v1.2
+     */
+    @XmlTransient
+    private String tempLogsDirectory;
+    
     /**
      * The port the server will connect to.<br>
      * Default: 25123
@@ -63,15 +77,15 @@ public class ServerConfiguration {
     
     /**
      * Indicates whether one user can log in several times. In production mode
-     * it is not advised to set this to true.<br>
+     * it is not recommended to set this to true.<br>
      * Default: false
      */
     private boolean isMultiLoginAllowed;
 
     
     /**
-     * URL to a php script which returns the server's external IP address.
-     * The script is as follows:
+     * URL to a service which returns the server's external IP address (referer) as plain text.<br>
+     * If the service is implemented autonomically, the php script is as follows:
      * &lt;?php echo $_SERVER['REMOTE_ADDR']; ?&gt;
      * Default: 
      */
@@ -98,6 +112,14 @@ public class ServerConfiguration {
      */        
     private String gameSourcesDirectory;    
     
+    /**
+     * Indicates whether the credentials of the clients will be checked from the server.<br>
+     * If true, no username or identification code will be checked. An anonymous user will be created ad-hoc at runtime and discarded after the game termination or stop of the server
+     * @since v1.2
+     */
+    private boolean isAnonymousLoginAllowed;
+    
+    
     /** The sole instance of the ServerConfiguration */
     private static ServerConfiguration instance;
 
@@ -114,91 +136,8 @@ public class ServerConfiguration {
             return instance;
         }
     }
-
-    /** Creates the Singleton instance */
-    static void initialize() {
-        instance = new ServerConfiguration();
-        instance.readConfiguration();
-    }
-
-    /** Private constructor to prevent direct instantiation */
-    private ServerConfiguration() {
-    }
-
-    /**
-     * This method reads the server configuration. By default it will load the
-     * file 'conf/ServerConfig.xml'. This file is directly dependent on the
-     * "ServerConfiguration" class. If the file does not exist, a new file will
-     * be created and hard coded default values will be used.
-     */
-    private void readConfiguration() {
-        // Load the configuration file and check for the existance
-        File configFile = new File("conf/ServerConfig.xml");
-        if (configFile.exists()) {
-            // Unmarshall/parse  the configuration file's content directly using JAXB
-            instance = (ServerConfiguration) JAXB.unmarshal(configFile, ServerConfiguration.class);
-            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Configuration file read.");
-        } else {
-            //If the configuration file does not exist,
-            // standard, hard coded settings will be used and a new settings file will be created.
-            ServerConfiguration.createNewConfiguration();
-            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Configuration file could not be read, using default values instead.");
-        }
-    }
     
-    /** Creates a new ServerConfig.xml and writes it to the file system  */
-    private static void createNewConfiguration() {
-        // This preferences are hard coded values.
-        // They will be written to the "ServerConfig.xml" after running this method.
-        //\\***************************************//\\
-        int newPortNumber = 25123;
-        boolean newIsConsoleMode = false;
-        boolean newIsCompactLoggingEnabled = false;
-        int newKeepAliveTimeOut = 10000;
-        boolean newUseKeepAliveManager = false;
-        boolean newMultiLoginAllowed = false;
-        boolean newXMLlogging = false;
-        boolean newHidesOnClose = false;
-        String newWhatIsMyIpUrl = "http://icanhazip.com/"; // Alter default value if php script migrated to fhnw doamin (or similar)
-        String newLogDirectory = "./logs";
-        String newGamelibsDirectory = "./gamelibs";
-        String newGameSourcesDirectory = "./games";
-        //\\***************************************//\\
-
-
-        instance = getInstance();
-        instance.portNumber = newPortNumber;
-        instance.isConsoleMode = newIsConsoleMode;
-        instance.isCompactLoggingEnabled = newIsCompactLoggingEnabled;
-        instance.keepAliveTimeOut = newKeepAliveTimeOut;
-        instance.useKeepAliveManager = newUseKeepAliveManager;
-        instance.isMultiLoginAllowed = newMultiLoginAllowed;
-        instance.isXMLlogging = newXMLlogging;
-        instance.hidesOnClose = newHidesOnClose;
-        instance.whatIsMyIpUrl = newWhatIsMyIpUrl;
-        instance.logDirectory = newLogDirectory;
-        instance.gamelibsDirectory = newGamelibsDirectory;
-        instance.gameSourcesDirectory = newGameSourcesDirectory;
-        
-        File outputFile = new File("conf/ServerConfig.xml");
-        
-        if (outputFile.exists() == true) {
-            outputFile.delete();
-        }
-
-        try {
-            new File("conf").mkdir();
-            outputFile.createNewFile();
-            Logger.getLogger(ServerConfiguration.class.getName()).log(Level.INFO, "Created a new configuration file.");
-        } catch (IOException ex) {
-            Logger.getLogger(ServerConfiguration.class.getName()).log(Level.SEVERE, "Could not create new configuration file.", ex);
-        }
-        
-        
-        JAXB.marshal(instance, outputFile);
-        instance.printConfiguration();
-    }
-
+    
     /** See {@link ServerConfiguration#portNumber}. */
     @XmlElement(name = "PortNumber")
     public int getPortNumber() {
@@ -270,6 +209,12 @@ public class ServerConfiguration {
     public String getGameSourcesDirectory() {
         return gameSourcesDirectory;
     }           
+    
+    /** See {@link ServerConfiguration#isAnonymousLoginAllowed}. */
+    @XmlElement(name = "IsAnonymousLoginAllowed")
+    public boolean getIsAnonymousLoginAllowed(){
+        return isAnonymousLoginAllowed;
+    }
 
     /** See {@link ServerConfiguration#portNumber}. */
     public void setPortNumber(int portNumber) {
@@ -331,6 +276,130 @@ public class ServerConfiguration {
     public void setGameSourcesDirectory(String gameSourcesDirectory) {
         this.gameSourcesDirectory = gameSourcesDirectory;
     }    
+    
+    /** See {@link ServerConfiguration#isAnonymousLoginAllowed}. */
+    public void setIsAnonymousLoginAllowed(boolean isAnonymousLoginAllowed)
+    {
+        this.isAnonymousLoginAllowed = isAnonymousLoginAllowed;
+    }
+   
+    /** See {@link ServerConfiguration#tempLogsDirectory}. */
+    @XmlTransient
+    public String getTempLogsDirectory() {
+        return tempLogsDirectory;
+    }
+
+    /** See {@link ServerConfiguration#tempLogsDirectory}. */
+    public void setTempLogsDirectory(String tempLogsDirectory) {
+        this.tempLogsDirectory = tempLogsDirectory;
+    }     
+    
+    /** Creates the Singleton instance */
+    static void initialize() {
+        instance = new ServerConfiguration();
+        instance.readConfiguration();
+    }
+
+    /** Private constructor to prevent direct instantiation */
+    private ServerConfiguration() {
+        this.tempLogsDirectory = "";    // Must be empty at starup. Only used if directory changed
+    }
+
+    /**
+     * This method reads the server configuration. By default it will load the
+     * file 'conf/ServerConfig.xml'. This file is directly dependent on the
+     * "ServerConfiguration" class. If the file does not exist, a new file will
+     * be created and hard coded default values will be used.
+     */
+    private void readConfiguration() {
+        // Load the configuration file and check for the existance
+        File configFile = new File("conf/ServerConfig.xml");
+        if (configFile.exists()) {
+            // Unmarshall/parse  the configuration file's content directly using JAXB
+            instance = (ServerConfiguration) JAXB.unmarshal(configFile, ServerConfiguration.class);
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Configuration file read.");
+        } else {
+            //If the configuration file does not exist,
+            // standard, hard coded settings will be used and a new settings file will be created.
+            ServerConfiguration.createNewConfiguration();
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Configuration file could not be read, using default values instead.");
+        }
+    }
+    
+    /** Creates a new ServerConfig.xml and writes it to the file system  */
+    private static void createNewConfiguration() {
+        // This preferences are hard coded values.
+        // They will be written to the "ServerConfig.xml" after running this method.
+        //\\***************************************//\\
+        int newPortNumber = 25123;
+        boolean newIsConsoleMode = false;
+        boolean newIsCompactLoggingEnabled = false;
+        int newKeepAliveTimeOut = 10000;
+        boolean newUseKeepAliveManager = false;
+        boolean newMultiLoginAllowed = false;
+        boolean newXMLlogging = false;
+        boolean newHidesOnClose = false;
+        boolean anonymousLoginAllowed = false;
+        String newWhatIsMyIpUrl = "http://icanhazip.com/"; // Alter default value if php script migrated to fhnw doamin (or similar)
+        String newLogDirectory = "./logs";
+        String newGamelibsDirectory = "./gamelibs";
+        String newGameSourcesDirectory = "./games";
+        //\\***************************************//\\
+
+
+        instance = getInstance();
+        instance.portNumber = newPortNumber;
+        instance.isConsoleMode = newIsConsoleMode;
+        instance.isCompactLoggingEnabled = newIsCompactLoggingEnabled;
+        instance.keepAliveTimeOut = newKeepAliveTimeOut;
+        instance.useKeepAliveManager = newUseKeepAliveManager;
+        instance.isMultiLoginAllowed = newMultiLoginAllowed;
+        instance.isXMLlogging = newXMLlogging;
+        instance.hidesOnClose = newHidesOnClose;
+        instance.whatIsMyIpUrl = newWhatIsMyIpUrl;
+        instance.logDirectory = newLogDirectory;
+        instance.gamelibsDirectory = newGamelibsDirectory;
+        instance.gameSourcesDirectory = newGameSourcesDirectory;
+        instance.isAnonymousLoginAllowed = anonymousLoginAllowed;
+        instance.tempLogsDirectory = ""; // Must be empty at starup. Only used if directory changed
+        
+        saveConfiguration(instance, "conf", "ServerConfig.xml");
+    }
+
+    /**
+     * Saves the defined configuration
+     * @param config Configuration to save
+     * @param folder Folder where configuration is located. Do not add a trailing slash (/ or \)
+     * @param file File to save the configuration in
+     * @since v1.2
+     */
+    private static void saveConfiguration(ServerConfiguration config, String folder, String file)
+    {
+        File outputFile = new File(folder + "/" + file);
+        if (outputFile.exists() == true) {
+            outputFile.delete();
+        }
+        try {
+            new File(folder).mkdir();
+            outputFile.createNewFile();
+            Logger.getLogger(ServerConfiguration.class.getName()).log(Level.INFO, "Created a new configuration file.");
+            JAXB.marshal(config, outputFile);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerConfiguration.class.getName()).log(Level.SEVERE, "Could not create new configuration file.", ex);
+        }
+        config.printConfiguration();      
+    }
+    
+    /**
+     * Saves the current singleton instance of the server configuration
+     * @since v1.2
+     */
+    public static void saveInstance()
+    {
+        saveConfiguration(ServerConfiguration.instance,"conf", "ServerConfig.xml");
+    }
+
+  
 
     /**
      * Logs the current ServerConfiguration.
@@ -343,6 +412,7 @@ public class ServerConfiguration {
             keepAliveTimeOut,
             useKeepAliveManager,
             isMultiLoginAllowed,
+            isAnonymousLoginAllowed,
             isXMLlogging,
             hidesOnClose,
             whatIsMyIpUrl,
@@ -357,13 +427,14 @@ public class ServerConfiguration {
                 + "IsCompactLoggingEnabled: {2}\n"
                 + "KeepAliveTimeOut: {3}\n"
                 + "UseKeepAliveManager: {4}\n"
-                + "IsMultiLoginAllowed: {5}\n"            
-                + "IsXMLlogging: {6}\n"
-                + "HidesOnClose: {7}\n"
-                + "WhatIsMyIpUrl: {8}\n"
-                + "LogDirecory: {9}\n"
-                + "GamelibsDirecory: {10}\n"
-                + "GameSourcesDirecory: {11}\n",
+                + "IsMultiLoginAllowed: {5}\n"   
+                + "IsAnonymousLoginAllowed: {6}\n" 
+                + "IsXMLlogging: {7}\n"
+                + "HidesOnClose: {8}\n"
+                + "WhatIsMyIpUrl: {9}\n"
+                + "LogDirecory: {10}\n"
+                + "GamelibsDirecory: {11}\n"
+                + "GameSourcesDirecory: {12}\n",
                 configurationItems);
     }
     /**

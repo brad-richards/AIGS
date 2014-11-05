@@ -23,7 +23,10 @@ import org.apache.tools.ant.*;
  * will first check whether there is already a URLClassLoader pointing to the
  * jar containing all the game classes. If that is not the case, a new class
  * loader will be created and added to the {@link GameLoader#allClassLoaders}
- * collection.
+ * collection.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.2 Added new methods
  *
  * @author Matthias Stöckli (v1.0)
  * @version 1.2 (Raphael Stoeckli, 07.10.2014)

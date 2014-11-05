@@ -13,13 +13,17 @@ import org.fhnw.aigs.commons.communication.Message;
 
 /**
  * Serverseitiges Logik des Spiels. Hier werden alle Resultate verarbeitet und an die Clients zurückgeschickt.<br>
- * Aus Game abgeleitete Klasse.
+ * Aus Game abgeleitete Klasse.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Changes due to dependencies
  * @author Raphael Stoeckli
+ * @version v1.1
  */
 public class GameLogic extends Game {
     
     // KONSTANTEN
     public static final String GAMENAME = "RockPaperScissors";                  // Name des Spiels, definiert als Konstante. Um Client- von Server-Logik zu trennen wird nicht der Wert aus Main.GAMENAME verwendet
+    public static final String VERSION = "v1.1";                                // Version des Spiels (optionaler Parameter)
     public static final int MINNUMBEROFPLAYERS = 2;                             // Minimale Anzahl von Spielern für eine Partie als Konstante
     public static final int NUMBEROFTURNS = 3;                                  // Anzahl Züge, bis zu Spielende als Konstante
     
@@ -34,7 +38,7 @@ public class GameLogic extends Game {
      */
     public GameLogic()
     {
-        super(GameLogic.GAMENAME, GameLogic.MINNUMBEROFPLAYERS);                // Rufe Konstruktor von Super-Klasse auf. 
+        super(GameLogic.GAMENAME, GameLogic.VERSION, GameLogic.MINNUMBEROFPLAYERS);// Rufe Konstruktor von Super-Klasse auf. 
     }
 
     /**

@@ -7,8 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fhnw.aigs.commons.communication.*;
 
 /**
- * This message is used to 
+ * This message is used to handle Board change messages
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name="BoardChangeMessage")
 public class BoardChangeMessage extends Message {

@@ -7,6 +7,7 @@ import org.fhnw.aigs.commons.communication.Message;
 /**
  * Informs the client about the score needed to win the game.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name ="MaxScoreMessage")
 public class MaxScoreMessage extends Message{

@@ -7,6 +7,8 @@
 		<item value="710" key="DIALOG_X_ORIGIN"/>
 		<item value="269" key="DIALOG_Y_ORIGIN"/>
 	</section>
+	<section name="ExternalProjectImportWizard">
+	</section>
 	<section name="WORKBENCH_SETTINGS">
 		<list key="ENABLED_TRANSFERS">
 		</list>

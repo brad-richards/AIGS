@@ -42,7 +42,9 @@ import org.fhnw.aigs.commons.XMLHelper;
  * {@literal @}XmlElementWrapper annotation. The name attribute of the annotation is the
  * parent element's name, the
  * {@literal @}XmlElement's name attribute is the child's name in the marshalled XML
- * form.</li></ul>
+ * form.</li></ul><br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes
  * @author Matthias Stöckli (v1.0)
  * @version 1.1 (Raphael Stoeckli, 12.08.2014)
  */

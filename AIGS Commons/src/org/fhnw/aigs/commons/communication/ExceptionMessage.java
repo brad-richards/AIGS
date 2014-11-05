@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.*;
  * server side. It will allow the player to track down the error.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "ExceptionMessage")
 public class ExceptionMessage extends Message {

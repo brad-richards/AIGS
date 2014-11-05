@@ -12,6 +12,7 @@ import org.fhnw.aigs.commons.communication.ClientClosedMessage;
  * the application's window. It will send a ClientClosedMessage to the server
  * which will remove the game from the list of active games.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 class ClientShutdownCleanUp implements Runnable {
 

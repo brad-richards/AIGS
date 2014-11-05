@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * This message is used to inform the client about the status of a flag.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "MarkFieldStatusMesage")
 public class MarkFieldStatusMesage extends Message {
@@ -51,38 +52,62 @@ public class MarkFieldStatusMesage extends Message {
         this.minesLeft = minesLeft;
     }
 
+    /**
+     * see {@link MarkFieldStatusMesage#positionX}
+     */
     @XmlElement(name = "X")
     public int getPositionX() {
         return positionX;
     }
 
+     /**
+     * see {@link MarkFieldStatusMesage#positionY}
+     */
     @XmlElement(name = "Y")
     public int getPositionY() {
         return positionY;
     }
 
+     /**
+     * see {@link MarkFieldStatusMesage#hasFlag}
+     */    
     @XmlElement(name = "HasFlag")
     public boolean getHasFlag() {
         return hasFlag;
     }
 
+     /**
+     * see {@link MarkFieldStatusMesage#minesLeft}
+     */    
     @XmlElement(name = "MinesLeft")
     public int getMinesLeft() {
         return minesLeft;
     }
 
+    /**
+     * see {@link MarkFieldStatusMesage#positionX}
+     */ 
     public void setPositionX(int positionX) {
         this.positionX = positionX;
     }
 
+    /**
+     * see {@link MarkFieldStatusMesage#positionY}
+     */ 
     public void setPositionY(int positionY) {
         this.positionY = positionY;
     }
 
+    /**
+     * see {@link MarkFieldStatusMesage#hasFlag}
+     */ 
     public void setHasFlag(boolean hasFlag) {
         this.hasFlag = hasFlag;
     }
 
+    /**
+     * see {@link MarkFieldStatusMesage#minesLeft}
+     */ 
     public void setMinesLeft(int minesLeft) {
         this.minesLeft = minesLeft;
     }

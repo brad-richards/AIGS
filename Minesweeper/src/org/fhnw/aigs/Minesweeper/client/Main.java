@@ -11,9 +11,12 @@ import org.fhnw.aigs.commons.GameMode;
 /**
  * main class of the client application.<br>
  * All major settings of the particular game, like the game name or the game mode are to be defined in this class.<br>
- * Don't forgett to set the same game name in the class {@link org.fhnw.aigs.Minesweeper.server.GameLogic} in the package 'server'.
+ * Don't forgett to set the same game name in the class {@link org.fhnw.aigs.Minesweeper.server.GameLogic} in the package 'server'.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.2 Changes due to update on AIGSCommons and AIGSBaseClient
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.2 (Raphael Stoeckli, 04.11.2014)
  */
 public class Main extends Application {
     
@@ -39,23 +42,22 @@ public class Main extends Application {
         // content area. Reference a css layout file  and set the
         // title.
         BaseGameWindow root = new BaseGameWindow(primaryStage,"/Assets/Stylesheets/minesweeper.css", "Minesweeper");
-        primaryStage.setTitle("Minesweeper");
-        primaryStage.show(); // Show the window
+//      primaryStage.setTitle("Minesweeper");
+//      primaryStage.show(); // Show the window
 
         // Create a new board instance
-        MinesweeperBoard minesweeperBoard = new MinesweeperBoard(xFields, yFields,
-                minesweeperClientGame);
+        MinesweeperBoard minesweeperBoard = new MinesweeperBoard(xFields, yFields, minesweeperClientGame);
 
         // Define the appearance of the board and set the event handler
-        minesweeperBoard.setFields();
-        minesweeperBoard.setEventHandlers();
+//        minesweeperBoard.setFields();                                         //-->
+//        minesweeperBoard.setEventHandlers();                                  //-->
 
         // Set the newly created board as the main content of the window
-        root.setContent(minesweeperBoard);
+//        root.setContent(minesweeperBoard);                                    //-->
 
         // Show a loading screen which will disappear as soon as a connection
         // has been established
-        root.setOverlay(new LoadingWindow());
+//        root.setOverlay(new LoadingWindow());                                 //-->
 
         // Provide the game with a reference to the root window. This will allow
         // the game to change the header, footer etc. based on messages.
@@ -65,15 +67,17 @@ public class Main extends Application {
         // representation of the content.
         minesweeperClientGame.setMinesweeperBoard(minesweeperBoard);
 
-        Settings.tryLoadSettings(true);
+        root.InitGame(minesweeperBoard, minesweeperClientGame);                             // Initialized game
+        
+//        Settings.tryLoadSettings(true);
 
         // AWS: 54.213.87.246
-        ClientCommunication.setCredentials(minesweeperClientGame, Settings.getInstance().getServerAddress(), Settings.getInstance().getServerPort());
+//        ClientCommunication.setCredentials(minesweeperClientGame, Settings.getInstance().getServerAddress(), Settings.getInstance().getServerPort());
         // ClientCommunication.setCredentialsUsingOnlineConfiguration(minesweeperClientGame);  // DEPRECATED, respectively: to redefine
 
-        Thread communicationThread = new Thread(
-                ClientCommunication.getInstance());
-        communicationThread.start();
+//        Thread communicationThread = new Thread(
+//                ClientCommunication.getInstance());
+//        communicationThread.start();
     }
 
      /**

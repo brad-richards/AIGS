@@ -32,7 +32,7 @@ public class MinesweeperClientGame extends ClientGame{
     private int minesLeft = totalMines;
     
     public MinesweeperClientGame(String gameName, GameMode mode, int xFields, int yFields, int totalMines) {
-        super(gameName, mode);
+        super(gameName, "v1.1", mode);
         this.xFields = xFields;
         this.yFields = yFields;
         this.totalMines = totalMines;

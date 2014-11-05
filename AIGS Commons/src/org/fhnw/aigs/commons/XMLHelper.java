@@ -13,9 +13,12 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
 /**
- * This class provides XML-centred helper methods.
+ * This class provides XML-centred helper methods.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Added some further error handling
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public class XMLHelper {
 
@@ -33,24 +36,41 @@ public class XMLHelper {
      * @return The resulting Marshaller
      */
     public static Marshaller getUnformattedXMLMarshaller(Message message) {
+        // HACK: The very first call of a running game can cause a crash in marshaller. All further attemps running without problems. Problem with ClassLoader???
         JAXBContext context;
         Marshaller marshaller = null;
+        String errorMessage = "";
+        Exception outputException = null;
+       
+       boolean processingError = false;
+       for(int i = 0; i < 5; i++)  // In case of an exception, let's try n times and then give up (and handle error message)
+       { 
+            try {
+                context = JAXBContext.newInstance(message.getClass());
+                marshaller = context.createMarshaller();
 
-        try {
-            context = JAXBContext.newInstance(message.getClass());
-            marshaller = context.createMarshaller();
+                // Set the JAXB_FORMATTED_OUTPUT property.
+                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
+                return marshaller;
 
-            // Set the JAXB_FORMATTED_OUTPUT property.
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
-            return marshaller;
-
-        } catch (JAXBException ex) {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (Exception ex) // All other exceptions
-        {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
-        }
+            } catch (JAXBException ex) {
+                //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+                errorMessage = "";
+                outputException = ex;
+                processingError = true;
+            }
+            catch (Exception ex) // All other exceptions
+            {
+                errorMessage = "An unknown error occured.";
+                outputException = ex;
+                processingError = true;
+               // Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
+            }
+       }
+       if (processingError == true)
+       {
+           Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, errorMessage, outputException);
+       }
         return marshaller;
 
     }

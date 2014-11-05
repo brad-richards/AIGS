@@ -19,9 +19,12 @@ import org.fhnw.aigs.server.gui.ServerGUI;
  * <li>Starts logging</li>
  * <li>Starts GUI</li>
  * <li>Takes care of Keep Alive signals </li>
- * </ul>
+ * </ul><br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes
  *
  * @author Matthias Stöckli
+ * @version v1.1 (Raphael Stoeckli, 15.10.2014)
  */
 public class Main {
     
@@ -130,15 +133,24 @@ public class Main {
      * Starts the GUI.
      */
     private static void setUpGUI() {
-        ServerGUI gui = new ServerGUI();
-        gui.setVisible(true);
-        Logger.getLogger(Main.class.getName()).log(Level.INFO, "Set up GUI.\nNote: Please click on 'Start AIGS' to start the server (not started yet)");
+        //ServerGUI gui = new ServerGUI();
+        ServerGUI.getInstance().setVisible(true);
+        //gui.setVisible(true);
+        if (ServerConfiguration.getInstance().getIsAnonymousLoginAllowed() == true)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Set up GUI.\nLogin system is disabled. Players can participate without checking the credentials.\nNote: Please click on 'Start AIGS' to start the server (not started yet)");
+        }
+        else
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Set up GUI.\nLogin system is enabled. Playes can only participate after checking the credentials.\nNote: Please click on 'Start AIGS' to start the server (not started yet)");
+        }
     }
 
     /**
-     * Load all users for the identification process.
+     * Load all users for the identification process.<br>
+     * The visual presentation of the users is managed in {@link ServerGUI#loadUsers()}
      */
-    private static void loadUsers() {
+    public static void loadUsers() {
         User.readUsersFromXml();
     }
 }

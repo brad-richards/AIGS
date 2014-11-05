@@ -18,6 +18,7 @@ import org.fhnw.aigs.server.gui.ServerGUI;
      * automatically.
      * 
     * @author Matthias Stöckli
+    * @version v1.0
      */
     public class StartServerAction implements ActionListener{
     private JLabel statusLabel;

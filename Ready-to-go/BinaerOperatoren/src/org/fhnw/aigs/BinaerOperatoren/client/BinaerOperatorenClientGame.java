@@ -10,8 +10,11 @@ import org.fhnw.aigs.commons.communication.Message;
 import org.fhnw.aigs.swingClient.gameHandling.ClientGame;
     
 /**
- * This class represents the client side of the BinaerOperatorenSpiel.
+ * This class represents the client side of the BinaerOperatorenSpiel.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Minor changes due to versioning of the program (Program version is v1.1)
  * @author Matthias Stöckli
+ * @version v1.0.1
  */
 public class BinaerOperatorenClientGame extends ClientGame{
 
@@ -37,6 +40,7 @@ public class BinaerOperatorenClientGame extends ClientGame{
      */
     public BinaerOperatorenClientGame(String gameName){
         super(gameName);
+        this.setVersionString("v1.1"); // Version of the game
     }
     
     /**

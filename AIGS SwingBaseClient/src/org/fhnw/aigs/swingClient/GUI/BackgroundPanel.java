@@ -9,6 +9,7 @@ import javax.swing.JPanel;
  * A simple JPanel which shows a background pattern.
  * 
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class BackgroundPanel extends JPanel{
    
@@ -35,7 +36,7 @@ public class BackgroundPanel extends JPanel{
   
   /**
    * Loop the background image as many times as necessary and draw the images.
-   * @param g 
+   * @param g The graphics object of the instance
    */
   @Override
   protected void paintComponent(Graphics g) {

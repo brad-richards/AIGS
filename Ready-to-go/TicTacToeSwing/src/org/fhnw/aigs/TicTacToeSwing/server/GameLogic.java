@@ -20,6 +20,7 @@ import org.fhnw.aigs.TicTacToeSwing.commons.TicTacToeSymbol;
  * represent the fields, see {@link GameLogic#ticTacToeFields}.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class GameLogic extends Game {
 
@@ -43,7 +44,7 @@ public class GameLogic extends Game {
      * Empty constructor which is necessary in order to load the game.
      */
     public GameLogic() {
-        super("TicTacToeSwing", 2); // VERY IMPORTANT! The game name must be unique on the server (only onece 'TicTacToeSwing')
+        super("TicTacToeSwing", "v1.1", 2); // VERY IMPORTANT! The game name must be unique on the server (only onece 'TicTacToeSwing')
         xFields = 3;
         yFields = 3;
     }

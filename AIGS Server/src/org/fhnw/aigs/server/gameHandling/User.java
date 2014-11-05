@@ -19,12 +19,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import org.fhnw.aigs.commons.communication.IdentificationResponseMessage;
+import org.fhnw.aigs.server.gui.ServerGUI;
 
 /**
  * This class is responsible for all User related tasks. It loads generates user
- * files, loads users, logs them on and off.
+ * files, loads users, logs them on and off.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Major changes in handling
  *
  * @author Matthias Stöckli
+ * @version 1.1 (Raphael Stoeckli, 14.10.2014)
  */
 @XmlRootElement(name = "User")
 public class User {
@@ -35,7 +39,10 @@ public class User {
     @XmlTransient
     public static long userCount;
     /**
-     * A list of all current users. Will not be marshalled.
+     * A list of all current users. Will not be marshalled.<br>
+     * Do not use add and remove methods directly on this list. <br>
+     * Use instead {@link User#addUserToUserList(org.fhnw.aigs.server.gameHandling.User)} and 
+     * {@link User#removeUserFromUserList(org.fhnw.aigs.server.gameHandling.User)}.
      */
     @XmlTransient
     public static UserList users;
@@ -55,7 +62,137 @@ public class User {
      * A flag that indicates whether or not a user is online.
      */
     private boolean loggedIn;
+    
+    /**
+     * Indicates whether the user is a regular (known) user or an anonymos (adHoc created) user.<br>Will not be marshalled because adHoc users are not stored<br>
+     * See also {@link User#writeUsersToXml()} about the handling of non-persistent users
+     * @since v1.1
+     */
+    @XmlTransient
+    private boolean anonymousUser;
+    
+   /**
+     * Indicates whether the user is a copy of an already logged in user.<br>Will not be marshalled because doppelgangers are not stored<br>
+     * See also {@link User#writeUsersToXml()} about the handling of non-persistent users
+     * @since v1.1
+     */
+    @XmlTransient    
+    private boolean doppelganger;
+    
+    /**
+     * Indicates whether the user is a AI. This parameter is <b>optional</b>. Use it if you want to show an AI user in the server GUI.<br>Will not be marshalled because AIs are not stored<br>
+     * See also {@link User#writeUsersToXml()} about the handling of non-persistent users
+     * @since v1.1
+     */
+    @XmlTransient       
+    private boolean aiUser;
 
+    /**
+     * See {@link User#id}.
+     */
+    @XmlElement(name = "Id")
+    public long getId() {
+        return id;
+    }
+
+    /**
+     * See {@link User#userName}.
+     */
+    @XmlElement(name = "UserName")
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * See {@link User#identificationCode}.
+     */
+    @XmlElement(name = "IdentificationCode")
+    public String getIdentificationCode() {
+        return identificationCode;
+    }
+    
+    /**
+     * See {@link User#loggedIn}.
+     */
+    @XmlTransient
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+    
+    /**
+     * See {@link User#anonymousUser}.
+     */
+    @XmlTransient    
+    public boolean isAnonymousUser(){
+        return anonymousUser;
+    }
+
+     /**
+     * See {@link User#doppelganger}.
+     */
+    @XmlTransient    
+    public boolean isDoppelganger(){
+        return doppelganger;
+    }   
+    
+     /**
+     * See {@link User#aiUser}.
+     */
+    @XmlTransient    
+    public boolean isAI(){
+        return aiUser;
+    }    
+        
+    
+    /**
+     * See {@link User#id}.
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /**
+     * See {@link User#userName}.
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * See {@link User#identificationCode}.
+     */
+    public void setIdentificationCode(String identificationCode) {
+        this.identificationCode = identificationCode;
+    }
+
+    /**
+     * See {@link User#loggedIn}.
+     */
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+  
+    /**
+     * See {@link User#anonymousUser}.
+     */
+    public void setAnonymousUser(boolean isAnonymousUser) {
+        this.anonymousUser = isAnonymousUser;
+    }
+    
+     /**
+     * See {@link User#doppelganger}.
+     */
+    public void setDoppelganger(boolean isDoppelganger) {
+        this.doppelganger = isDoppelganger;
+    }    
+    
+     /**
+     * See {@link User#aiUser}.
+     */
+    public void setAI(boolean isAI) {
+        this.aiUser = isAI;
+    }      
+    
     /**
      * Empty, zero-argument constructor.
      */
@@ -69,11 +206,31 @@ public class User {
      * @param password The user's password/identification code.
      */
     public User(String userName, String password) {
-        this.id = userCount++;
+        this.id = getNextID();//userCount++;
         this.userName = userName;
         this.identificationCode = password;
-    }
-
+    }  
+    
+    /**
+     * Calculates the next free user ID from the static user list
+     * @since v1.1
+     * @return Next free user ID
+     */
+    private static long getNextID()
+    {
+        User.userCount = User.users.size();
+        long id = -1;
+        for (int i = 0; i < User.userCount; i++)
+        {
+            if (User.users.get(i).getId() > id)
+            {
+                id = User.users.get(i).getId();
+            }
+        }
+        id++;
+        return id;
+    }    
+    
     /**
      * Gets a user by his or her name.
      *
@@ -88,6 +245,90 @@ public class User {
         }
         return null;
     }
+    
+    /**
+     * Adds a new user to the static user list
+     * @param user User to add
+     */
+    public static void addUserToUserList(User user)
+    {
+        users.add(user);
+        if (ServerConfiguration.getInstance().getIsAnonymousLoginAllowed() == true)
+        {
+            if (user.isNonPersistentUser() == true)
+            {
+                ServerGUI.getInstance().addUserToList(user); // Add only non-persistent users
+            }
+        }
+        else
+        {
+            ServerGUI.getInstance().addUserToList(user); // Add all users
+        }
+        
+        userCount = users.size();
+    }
+    
+    /**
+     * Removes a User from the static user list
+     * @param user User to remove
+     * @since v1.1
+     */
+    public static void removeUserFromUserList(User user)
+    {
+        try
+        {
+        ServerGUI.getInstance().removeUserFromList(user);
+        users.remove(user);
+        userCount = users.size();                                                          // Update user Count 
+        }
+        catch(Exception e)
+        {
+            // No action. User is somply not in list --> Go ahead
+        }
+    }
+    
+    /**
+     * Removes all non persistent users (anonymous/AdHoc and doppelganger) from
+     * the static user list
+     * @since v1.1
+     */
+    public static void removeAllNonPersistentUsers()
+    {
+        for(int i = users.size() - 1; i >= 0; i--)                              // Inverse is better to delete the list from the end
+        {
+            if (users.get(i).isNonPersistentUser() == true)
+            {
+                removeUserFromUserList(users.get(i));
+                users.remove(i);
+            }
+        }
+        if (users.size() == 0)
+        {
+            User.userCount = 0;                                                 // Correction if <0
+        }
+    }
+    
+    /**
+     * Method checks whether the user is non persistent:<br>
+     * <ul>
+     * <li>Anonymous user (AdHoc)</li>
+     * <li>Doppelganger</li>
+     * <li>AI User</li>
+     * </ul>
+     * @return True if the user is non-persistent, otherwise false 
+     */
+    public boolean isNonPersistentUser()
+    {
+        if (this.anonymousUser == true || this.doppelganger == true || this.isAI() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
 
     /**
      * Generates a password or identification code based on the specified
@@ -123,6 +364,7 @@ public class User {
      *
      * @throws IOException Thrown when the file could not be read.
      * @throws JAXBException Thrown when the users could not be serialized.
+     * @deprecated Do not use thes method anymore. Use XML serialization ({@link User#readUsersFromXml()}) instead
      */
     private static void readUsersFromPlainText() throws IOException, JAXBException {
         File userFile = new File("conf/users.txt");
@@ -146,7 +388,7 @@ public class User {
 
                 // Create a new user based on the name and password/identification code
                 User user = new User(name, identificationCode);
-                users.add(user);
+                User.addUserToUserList(user);
                 Logger.getLogger(User.class.getName()).log(Level.INFO, "New user: {0}", name);
             }
         }
@@ -154,6 +396,88 @@ public class User {
         File outputFile = new File("conf/usersXml.xml");
         JAXB.marshal(users, outputFile);
         Logger.getLogger(User.class.getName()).log(Level.INFO, "Successfully created {0} users and saved to config file.", users.size());
+    }
+    
+    /**
+     * Handles the user login. If anonymous login is allowed, an Ad-hoc user will be created. If multiple logins are allowed, a doppelganger will be created.
+     * @param userName The user (login) name to be checked.
+     * @param playerName The users' displayed name
+     * @param password The user's password/identification code.
+     * @param isMultiLoginAllowed Flag that indicates whether the configuration
+     * @return A IdentificationResponseMessage which is sent back to the client.
+     * @since v1.1
+     */
+    public static IdentificationResponseMessage identify(String userName, String password, String playerName, boolean isMultiLoginAllowed)
+    {
+        IdentificationResponseMessage loginMessage;
+       if (ServerConfiguration.getInstance().getIsAnonymousLoginAllowed() == true) // No password or Username required
+       {
+           User adHoc = null;
+           String tempUsername = userName;
+           if (tempUsername.length() == 0)
+           {
+               tempUsername = "Player";
+           }
+           String tempPassword = password;
+           while (true) // Check until a valid user is determined
+           {
+                loginMessage = User.checkCredentials(tempUsername, tempPassword, isMultiLoginAllowed);
+                if (loginMessage.getLoginSuccessful() == false) // A user with these credentials already exists -> choose other name and password
+                {
+                    tempUsername = getUnusedUsername(tempUsername);
+                    tempPassword = User.generateRandomPassword(8);
+                    adHoc = new User(tempUsername, tempPassword);
+                    adHoc.setAnonymousUser(true);
+                    //User.users.add(adHoc);
+                    User.addUserToUserList(adHoc);
+                    continue; 
+                }
+                else
+                {
+                  break;
+                }
+           }
+           loginMessage.setPassword(tempPassword);
+       }
+       else
+       {
+           loginMessage = User.checkCredentials(userName, password, isMultiLoginAllowed);
+           loginMessage.setPassword(password);
+       }
+       loginMessage.setPlayerName(playerName);
+       return loginMessage;
+    }
+    
+    /**
+     * Returns an unused user name. This method is importatnt for anonymous login (Ad-hoc users)
+     * @param template The initial username to check
+     * @return A currently not used user name
+     * @since v1.1
+     */
+    private static String getUnusedUsername(String template)
+    {
+        int counter = 1;
+        boolean match = false;
+        String userName = template;
+        while(true)
+        {
+           match = false;
+           for(User user : User.users)
+            {
+                if (user.getUserName().equals(userName) == true)
+                {
+                    match = true;
+                    counter++;
+                    userName = template + Integer.toString(counter);
+                    break;
+                }
+            }
+           if (match == false)
+           {
+               break;
+           }
+        }
+        return userName;
     }
 
     /**
@@ -166,8 +490,9 @@ public class User {
      * option {@link ServerConfiguration#isMultiLoginAllowed} is set to true or
      * the server is running on localhost.
      * @return A IdentificationResponseMessage which is sent back to the client.
+     * @since v1.1 [was originally method identify(...)]
      */
-    public static IdentificationResponseMessage identify(String userName, String identificationCode, boolean isMultiLoginAllowed) {
+    private static IdentificationResponseMessage checkCredentials(String userName, String identificationCode, boolean isMultiLoginAllowed) {
         IdentificationResponseMessage identificationResponseMessage = new IdentificationResponseMessage();
 
         // Iterate through all users
@@ -183,8 +508,9 @@ public class User {
             } else {
                 if (user.isLoggedIn() == false) {
                     user.setLoggedIn(true);
-                    identificationResponseMessage.setUserName(user.getUserName());
+                    identificationResponseMessage.setLoginName(user.getUserName());
                     identificationResponseMessage.setLoginSuccessful(true);
+                    identificationResponseMessage.setReason("Login successful.");
                     break;
 
                     // If the user is already logged in, check whether multi login
@@ -193,16 +519,18 @@ public class User {
                 } else {
                     if (isMultiLoginAllowed) {
                         User newUser = User.generateDoppelganger(user);
-                        identificationResponseMessage.setUserName(newUser.getUserName());
+                        newUser.setDoppelganger(true);
+                        identificationResponseMessage.setLoginName(newUser.getUserName());
                         identificationResponseMessage.setLoginSuccessful(true);
-                        User.users.add(newUser);
+                        identificationResponseMessage.setReason("Created doppelganger. Login successful.");
+                        User.addUserToUserList(newUser);
                         break;
 
                         // If the user is already logged in and multi login is not
                         // allowed, set the flags accordingly.
                     } else {
                         user.setLoggedIn(true);
-                        identificationResponseMessage.setUserName(user.getUserName());
+                        identificationResponseMessage.setLoginName(user.getUserName());
                         identificationResponseMessage.setLoginSuccessful(false);
                         identificationResponseMessage.setReason("User is already logged in.");
                         return identificationResponseMessage;
@@ -216,7 +544,9 @@ public class User {
     }
 
     /**
-     * Remove a player from the list of active players/users.
+     * Remove a player from the list of active players/users. The user will not be removed 
+     * from the static user list. Use method {@link User#removeUserFromUserList(org.fhnw.aigs.server.gameHandling.User)} 
+     * if a user must be removed from the static user list.
      *
      * @param name The name of the player to be logged off.
      */
@@ -230,13 +560,17 @@ public class User {
         }
     }
 
+    /**
+     * Returns a list of stored users from the file conf/usersXml.xml
+     * @return List of registred users
+     */
     public static UserList readUsersFromXml() {
         // Load the users config file and check for the existance
         File userConfigFile = new File("conf/usersXml.xml");
         if (userConfigFile.exists()) {
             // Parse the user configuration file's content directly using JAXB
             users = (User.UserList) JAXB.unmarshal(userConfigFile, User.UserList.class);
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file read.");
+            Logger.getLogger(User.class.getName()).log(Level.INFO, "Read user configuration.");
             return users;
         } else {
             Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be read.");
@@ -244,6 +578,33 @@ public class User {
 
         return null;
     }
+    
+    /**
+     * Saves the static user list to the file conf/usersXml.xml
+     * @since v1.1
+     */
+    public static void writeUsersToXml(){
+        UserList tempList = new UserList();
+        for(int i = 0; i < users.size(); i++)
+        {
+            if (users.get(i).isNonPersistentUser() == true)
+            {
+                continue; // Skip non-persistent users
+            }
+            tempList.add(users.get(i));
+        }
+        File userConfigFile = new File("conf/usersXml.xml");
+        try
+        {
+            JAXB.marshal(tempList, userConfigFile);
+            Logger.getLogger(User.class.getName()).log(Level.INFO, "Write user configuration.");
+        }
+        catch(Exception ex)
+        {
+            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be written.");
+        }
+    }
+    
 
     /**
      * Reads users from a text file and writes it to an xml file.
@@ -251,71 +612,12 @@ public class User {
      * @param args No need for that.
      * @throws IOException
      * @throws JAXBException
+     * @deprecated Do not use this method. Use the visual user management tool from she Server GUI instead
      */
     public static void main(String args[]) throws IOException, JAXBException {
         readUsersFromPlainText();
-    }
-
-    /**
-     * See {@link User#id}.
-     */
-    @XmlElement(name = "Id")
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * See {@link User#userName}.
-     */
-    @XmlElement(name = "UserName")
-    public String getUserName() {
-        return userName;
-    }
-
-    /**
-     * See {@link User#identificationCode}.
-     */
-    @XmlElement(name = "IdentificationCode")
-    public String getIdentificationCode() {
-        return identificationCode;
-    }
-
-    /**
-     * See {@link User#loggedIn}.
-     */
-    @XmlTransient
-    public boolean isLoggedIn() {
-        return loggedIn;
-    }
-
-    /**
-     * See {@link User#id}.
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /**
-     * See {@link User#userName}.
-     */
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    /**
-     * See {@link User#identificationCode}.
-     */
-    public void setIdentificationCode(String identificationCode) {
-        this.identificationCode = identificationCode;
-    }
-
-    /**
-     * See {@link User#loggedIn}.
-     */
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
+    }    
+    
     /**
      * Generates a new user based on another user in the case multi login is
      * allowed.
@@ -376,5 +678,28 @@ public class User {
         public List<User> getUsers() {
             return this;
         }
+    }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getUserName());
+        sb.append(" (ID: ");
+        sb.append(this.getId());
+        sb.append(")");
+        if (this.isAnonymousUser() == true)
+        {
+            sb.append(" [AdHoc User]");
+        }
+        if (this.isDoppelganger() == true)
+        {
+            sb.append(" [Doppleganger]");
+        }
+        if (this.isAI() == true)
+        {
+            sb.append(" [AI]");
+        }
+       return sb.toString();
     }
 }

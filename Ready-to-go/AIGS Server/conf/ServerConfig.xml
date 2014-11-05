@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Configuration xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+    <GameSourcesDirectory>./games</GameSourcesDirectory>
     <GamelibsDirectory>./gamelibs</GamelibsDirectory>
-	<GameSourcesDirectory>./games</GameSourcesDirectory>
     <HidesOnClose>false</HidesOnClose>
+    <IsAnonymousLoginAllowed>true</IsAnonymousLoginAllowed>
     <IsCompactLoggingEnabled>false</IsCompactLoggingEnabled>
     <IsConsoleMode>false</IsConsoleMode>
     <IsMultiLoginAllowed>false</IsMultiLoginAllowed>

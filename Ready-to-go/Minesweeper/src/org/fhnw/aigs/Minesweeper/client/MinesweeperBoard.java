@@ -16,8 +16,12 @@ import org.fhnw.aigs.commons.communication.Message;
  * This is the class representing the Minesweeper board.
  * It contains x x y MinesweeperPanes.
  * All event handlers and animations as well as the creation of the MinesweeperPanes
- * occurs here.
- * @author Matthias Stöckli
+ * occurs here.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Change of handling and UI improvements
+ *
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 04.11.2014)
  */
 public class MinesweeperBoard extends BaseBoard {
 
@@ -28,7 +32,9 @@ public class MinesweeperBoard extends BaseBoard {
      * @param clientGame Reference to the ClientGame.
      */
     public MinesweeperBoard(int fieldsX, int fieldsY, ClientGame clientGame) {
-        super(fieldsX, fieldsY, clientGame);    
+        super(fieldsX, fieldsY, clientGame);
+        this.setFields();
+        this.setEventHandlers();
     }
 
     /**

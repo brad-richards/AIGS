@@ -1,17 +1,17 @@
-Grundgerüst
+ï»¿GrundgerÃ¼st
 ------------
 
-In der Zip-Datei befindet sich das NetBeans/Eclipse-Projekt für das Grundgerüst.
-Die Dateien müssen entpackt und mit dem ebenfalls entpackten Verzeichnis "RockPaperScissors" im Projektverzeichnis abgelegt werden. Bei NetBeans kann dies Verzeichnis an einem beliebigen Ort sein. Bei Eclipse befindet es sich im Workspace.
+In der Zip-Datei befindet sich das NetBeans/Eclipse-Projekt fÃ¼r das GrundgerÃ¼st.
+Die Dateien mÃ¼ssen entpackt und mit dem ebenfalls entpackten Verzeichnis "RockPaperScissors" im Projektverzeichnis abgelegt werden. Bei NetBeans kann dies Verzeichnis an einem beliebigen Ort sein. Bei Eclipse befindet es sich im Workspace.
 
 ---------------
 
-In NetBenas kann das Projekt einfach über File --> Open Project geöffnet werden.
+In NetBenas kann das Projekt einfach Ã¼ber File --> Open Project geÃ¶ffnet werden.
 
-Für Eclipse muss der Workspace auf den Ordner gelegt werden, welcher den entpackten Unterordner "RockPaperScissors" enthält und danach ein neues Projekt mit dem Namen "RockPaperScissors" erstellt werden.
+FÃ¼r Eclipse muss der Workspace auf den Ordner gelegt werden, welcher den entpackten Unterordner "RockPaperScissors" enthÃ¤lt und danach ein neues Projekt mit dem Namen "RockPaperScissors" erstellt werden.
 
-Alternativ kann das Projekt in Eclipse mit dem Import-Assistenten übernommen werden.
+Alternativ kann das Projekt in Eclipse mit dem Import-Assistenten Ã¼bernommen werden.
 
 ---------------
 
-Siehe Tutorials für Anweisungen, wie Projekte aus bestehenden Quellen angelegt werden.
+Siehe Tutorials fÃ¼r Anweisungen, wie Projekte aus bestehenden Quellen angelegt werden.

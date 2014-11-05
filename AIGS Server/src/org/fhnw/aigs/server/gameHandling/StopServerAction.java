@@ -20,9 +20,11 @@ import org.fhnw.aigs.server.gui.ServerGUI;
     /**
      * Responsible for stopping the server without closing the server GUI.
      * This class will be used by the server GUI if one clicks on the button
-     * "stop server", if the Console Mode is active
+     * "stop server", if the Console Mode is active<br>
+     * v1.0   Initial release<br>
+     * v1.0.1 Minor changes
     * @author Raphael Stoeckli
-    * @version 1.0
+    * @version 1.0.1 (27.10.2014)
      */
 public class StopServerAction implements ActionListener{
     
@@ -82,6 +84,7 @@ public class StopServerAction implements ActionListener{
                 cleanUpThread.join();
             }
             catch(InterruptedException ex){}
+            User.removeAllNonPersistentUsers();                                 // Removes all previously created users
             ServerCommunication.getInstance().stop(); // Run this at the end of cleanUpThread
             Logger.getLogger(ServerGUI.class.getName()).log(Level.INFO, "Server shut down finished. No further messages will be sent to clients. ");                
         }    

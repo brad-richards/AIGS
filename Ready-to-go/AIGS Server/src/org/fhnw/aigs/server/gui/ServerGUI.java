@@ -48,58 +48,99 @@ import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
 import org.fhnw.aigs.server.gameHandling.ShowLogsAction;
 import org.fhnw.aigs.server.gameHandling.StartServerAction;
 import org.fhnw.aigs.server.gameHandling.StopServerAction;
+import org.fhnw.aigs.server.gameHandling.User;
 
 /**
- * This is the server's GUI. There are total of three information panels:
+ * This is the server's GUI. Several controls and information panels are provided.<br>
+ * Controls:<br>
  * <ul>
- * <li>A text field showing all logs.</li>
- * <li>A list of all running games.</li>
- * <li>An information panel about the running games.</li>
+ * <li>Start server (service)</li>
+ * <li>Stop server (service)</li>
+ * <li>Close the program</li>
+ * <li>Show the logs</li>
+ * <li>Reload the avilable games</li>
+ * <li>Recompile and reload the avalibale games. Thos only applies if game projects are stored on the AIGS server</li>
+ * <li>Call the server settings dialog (configuration)</li>
+ * <li>Call the user management dialog</li>
+ * <li>End a game (forced) if selected in the list of waiting or running games</li>
  * </ul>
- * <br>
- * Additionally there are four buttons:
+ *<br>
+ * Information panels:<br>
  * <ul>
- * <li>A button to start the server. </li>
- * <li>A button to close/terminate the server. </li>
- * <li>A button to show the folder where the logs are locatet</li>
- * <li>A button to reload and recompile all games classes</li>
+ * <li>The server log</li>
+ * <li>A list of available / installed games</li>
+ * <li>A list of active users. This list will show the persistent users if anonymous login is disabled, otherwise adHoc created users</li>
+ * <li>A list of active (running) games</li>
+ * <li>A list of waiting (not started yet) games</li>
+ * <li>Detail information panel with a list of participants of a selected game</li>
  * </ul>
  * <br>
  * Please not that some functionality is implemented in subclasses, e.g.
- * the server start.
+ * the server start.<br>
+ * <br>v1.1 New functions and fixes
+ * <br>v1.2 New functions (settings and user management) and change from static to singleton
  * @author Matthias Stöckli
+ * @version v1.2 (Raphael Stoeckli, 15.10.2014)
  */
 public class ServerGUI extends JFrame {
+    
+    /**
+     * The singleton instance of the GUI
+     */
+    private static ServerGUI instance;
 
-    public static Game selectedGame;
-    private static JList gameList;
-    private static JScrollPane gameListScrollPane;
-    private static JList waitingGameList;
-    private static JScrollPane waitingGameListScrollPane;    
-    private static JList availableGamesList;
-    private static JScrollPane availableGamesListScrollPane;    
-    private static JTextArea logTextArea;
-    private static JScrollPane logTextAreaScrollPane;
-    private static JPanel gameInformationPanel;  
-    private static JPanel topPanel;
-    private static JPanel statusPanel;
-    private static JPanel buttonPanel;        
-    private static Vector<Game> listContent;
-    private static Vector<Game> waitingListContent;
-    private static Vector<String> availableGamesContent;
+    /**
+     * Gets the singleton instance or initializes it if not defined
+     * @return instance of the GUI
+     */
+    public static ServerGUI getInstance() {
+        if (instance == null)
+        {
+            instance = new ServerGUI();
+        }
+        return instance;
+    }
+    
+    public  Game selectedGame;
+    private JList gameList;
+    private JScrollPane gameListScrollPane;
+    private JList waitingGameList;
+    private JScrollPane waitingGameListScrollPane;    
+    private JList availableGamesList;
+    private JScrollPane availableGamesListScrollPane;    
+    private JTextArea logTextArea;
+    private JScrollPane logTextAreaScrollPane;
+    private JPanel gameInformationPanel;  
+    private JPanel topPanel;
+    private JPanel statusPanel;
+    private JPanel settingsPanel;
+    private JPanel buttonPanel;        
+    private Vector<Game> listContent;
+    private Vector<Game> waitingListContent;
+    private Vector<String> availableGamesContent;
+    private Vector<User> activeUsersContent;
     private JButton startButton;
     private JButton stopButton;
+    private JButton closeButton;
+    private JButton showLogsButton;
     private JButton reloadClassesButton;
     private JButton recompileClassesButton;
+    private JButton settingsButton;
+    private JButton userManagementButton;
     private JLabel statusLabel;
     private JLabel gameNameLabel;
     private JLabel participantsLabel;
+    private JLabel versionLabel;
     
-    private static JList participantsList;
-    private static JScrollPane particiantsScrollPane;      
-    private static ListModel participantsModel;
+    private JList activeUsersList;
+    private JScrollPane activeUsersListScrollPane;    
+    
+    private JList participantsList;
+    private JScrollPane particiantsScrollPane;      
+    private ListModel participantsModel;
     
     private JLabel partyLabel;
+    private JLabel publicGameLabel;
     private JLabel idLabel;
     private JLabel ipLabel;
     private JButton endGameButton;
@@ -120,13 +161,16 @@ public class ServerGUI extends JFrame {
         setUpGameInformationPanel();
         setUpGameList();
         setUpAvailableGames();
+        setUpActiveUsers();
+        loadUsers();
        
         setupActionListeners();
         
         logTextAreaScrollPane.setBounds(10,0,650,615);
         gameInformationPanel.setBounds(1020,200,220,415);
         allGamesPanel.setBounds(670,200,340, 415);
-        availableGamesListScrollPane.setBounds(670, 0, 570, 190);
+        availableGamesListScrollPane.setBounds(670, 0, 280, 190); //570>280
+        activeUsersListScrollPane.setBounds(960, 0, 280, 190); //570>285
         
         allGamesPanel.add(gameListScrollPane);
         allGamesPanel.add(waitingGameListScrollPane);
@@ -135,6 +179,7 @@ public class ServerGUI extends JFrame {
         middlePanel.add(allGamesPanel);
         middlePanel.add(gameInformationPanel);
         middlePanel.add(availableGamesListScrollPane);
+        middlePanel.add(activeUsersListScrollPane);
         
         
         this.add(middlePanel, BorderLayout.CENTER);
@@ -234,7 +279,7 @@ public class ServerGUI extends JFrame {
      * @param game The game to be added
      * @param waiting If true, the game will be added to the waiting games list, otherwiese to the active games list
      */
-    public static void addGameToList(Game game, boolean waiting) {
+    public void addGameToList(Game game, boolean waiting) {
         if (waiting == true)
         {
          waitingListContent.add(game);
@@ -253,7 +298,7 @@ public class ServerGUI extends JFrame {
      * @param game The game to be removed
      * @param waiting If true, the game will be removed from the waiting games list, otherwiese from the active games list
      */
-    public static void removeGameFromList(Game game, boolean waiting) {
+    public void removeGameFromList(Game game, boolean waiting) {
         if (waiting == true)
         {
         waitingListContent.remove(game);        
@@ -267,6 +312,37 @@ public class ServerGUI extends JFrame {
         gameList.setSelectedIndex(-1);
         }
     }
+    
+    /**
+     * Adds the specified user to the list
+     * @param user User to add
+     */
+    public void addUserToList(User user)
+    {
+        activeUsersContent.add(user);
+        activeUsersList.setListData(activeUsersContent);
+    }
+    
+    /**
+     * Removes all usrest from the list
+     */
+    public void removeAllUsersFromList()
+    {
+        activeUsersContent.clear();
+        activeUsersList.setListData(activeUsersContent);
+    }
+    
+    /**
+     * Removes the specified user from the list
+     * @param user User to remove
+     */
+    public void removeUserFromList(User user)
+    {
+        activeUsersContent.remove(user);
+        activeUsersList.setListData(activeUsersContent);
+        activeUsersList.setSelectedIndex(-1);
+    }
+    
 
     /**
      * Returns the game having a specified index in the game list.
@@ -275,11 +351,11 @@ public class ServerGUI extends JFrame {
      * @param waiting If true, the source ist the list of waiting games, otherwise the list of active games
      * @return Game at the specified position/index.
      */
-    public static Game getGameFromListByListIndex(int listIndex, boolean waiting) {
+    public Game getGameFromListByListIndex(int listIndex, boolean waiting) {
         if (waiting == true)
         {
             if(listIndex >= 0){
-                return waitingListContent.elementAt(listIndex);
+                return ServerGUI.getInstance().waitingListContent.elementAt(listIndex);
             }else{
                 return null;
             }
@@ -287,7 +363,7 @@ public class ServerGUI extends JFrame {
         else
         {
             if(listIndex >= 0){
-                return listContent.elementAt(listIndex);
+                return ServerGUI.getInstance().listContent.elementAt(listIndex);
             }else{
                 return null;
             }            
@@ -314,12 +390,16 @@ public class ServerGUI extends JFrame {
     private void setUpTopPanel() {
         topPanel = new JPanel(new GridLayout(2, 1));
         topPanel.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
-        statusPanel = new JPanel(new GridLayout(1,3));
+        statusPanel = new JPanel(new GridLayout(1,4));
         buttonPanel = new JPanel(new GridLayout(1,5));
+        settingsPanel = new JPanel(new GridLayout(1,2));
+        settingsPanel.setBorder( new EmptyBorder( 10, 200, 10, 0 ));
         
         
         this.add(topPanel, BorderLayout.NORTH);
         ImageIcon logoImage = new ImageIcon(getClass().getResource("/imgs/logo.png"));
+        ImageIcon settingsLogo = new ImageIcon(getClass().getResource("/imgs/settings.png"));
+        ImageIcon usersLogo = new ImageIcon(getClass().getResource("/imgs/users.png"));
         JLabel logoLabel = new JLabel(logoImage);
         
         statusLabel = new JLabel("offline");
@@ -337,11 +417,21 @@ public class ServerGUI extends JFrame {
         startButton.addActionListener(new StartServerAction(statusLabel, startButton, stopButton));
         
         statusLabel.setForeground(new Color(24, 105, 36));        
+        
+        settingsButton = new JButton(settingsLogo);
+        settingsButton.addActionListener(new SettingsAction());
+        settingsButton.setToolTipText("Opens the system settings window");
+        userManagementButton = new JButton(usersLogo);
+        userManagementButton.addActionListener(new UserSettingsAction());
+        userManagementButton.setToolTipText("Opens the user management window");
+        settingsPanel.add(settingsButton);
+        settingsPanel.add(userManagementButton);
+        
 
-        JButton closeButton = new JButton("Close AIGS");
+        closeButton = new JButton("Close AIGS");
         closeButton.addActionListener(new ServerGUI.CloseServerAction());
 
-        JButton showLogsButton = new JButton("Show Logs");
+        showLogsButton = new JButton("Show Logs");
         showLogsButton.addActionListener(new ShowLogsAction());
         
         reloadClassesButton = new JButton("Reload classes");     
@@ -351,6 +441,7 @@ public class ServerGUI extends JFrame {
         statusPanel.add(logoLabel);
         statusPanel.add(statusLabel);
         statusPanel.add(ipLabel);
+        statusPanel.add(settingsPanel);
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
         buttonPanel.add(closeButton);
@@ -389,17 +480,22 @@ public class ServerGUI extends JFrame {
         statusLabel.setBounds(10,25,400,20);
         gameNameLabel = new JLabel("Game:        ");
         gameNameLabel.setBounds(new Rectangle(10, 50, 400, 20));
+        versionLabel = new JLabel("Version:        ");
+        versionLabel.setBounds(new Rectangle(10, 75, 400, 20));        
+        partyLabel = new JLabel("Party name:  ");
+        partyLabel.setBounds(new Rectangle(10, 100, 400, 20));
+        publicGameLabel = new JLabel("Public party:  ");
+        publicGameLabel.setBounds(new Rectangle(10, 125, 400, 20));
         participantsLabel = new JLabel("Participants:");
-        participantsLabel.setBounds(new Rectangle(10, 75, 400, 20));
+        participantsLabel.setBounds(new Rectangle(10, 150, 400, 20));
         
         participantsList = new JList();
         participantsModel = new DefaultListModel();
         participantsList.setModel(participantsModel);
         particiantsScrollPane = new JScrollPane(participantsList);
-        particiantsScrollPane.setBounds(10, 95, 190, 165);
+        particiantsScrollPane.setBounds(10, 170, 190, 165);        
         
-        partyLabel = new JLabel("Party name:  ");
-        partyLabel.setBounds(new Rectangle(10, 260, 400, 40));
+        
 
         endGameButton = new JButton("End game");
         endGameButton.setEnabled(false);
@@ -414,9 +510,12 @@ public class ServerGUI extends JFrame {
         rightPanelContentPanel.add(idLabel);
         rightPanelContentPanel.add(statusLabel);
         rightPanelContentPanel.add(gameNameLabel);
+        rightPanelContentPanel.add(versionLabel);
         rightPanelContentPanel.add(participantsLabel);
-        rightPanelContentPanel.add(particiantsScrollPane);
         rightPanelContentPanel.add(partyLabel);
+        rightPanelContentPanel.add(publicGameLabel);
+        rightPanelContentPanel.add(particiantsScrollPane);
+        
         gameInformationPanel.add(rightPanelContentPanel, BorderLayout.CENTER);
     } 
 
@@ -435,7 +534,7 @@ public class ServerGUI extends JFrame {
     }
 
     /**
-     * Sets up the game list in the middle.
+     * Sets up the game lists (waiting and running) in the lower middle part.
      */
     private void setUpGameList() {
         listContent = new Vector<Game>();
@@ -447,12 +546,12 @@ public class ServerGUI extends JFrame {
         gameListScrollPane.setBorder(BorderFactory.createTitledBorder(new MetalBorders.TextFieldBorder(), "Active Games"));
         waitingGameListScrollPane.setBorder(BorderFactory.createTitledBorder(new MetalBorders.TextFieldBorder(), "Waiting Games"));
         
-        gameList.addListSelectionListener(new ServerGUI.GameListSelectionListener(gameNameLabel, participantsList, idLabel, partyLabel, statusLabel, endGameButton, false));
-        waitingGameList.addListSelectionListener(new ServerGUI.GameListSelectionListener(gameNameLabel, participantsList, idLabel, partyLabel, statusLabel, endGameButton, true));
+        gameList.addListSelectionListener(new ServerGUI.GameListSelectionListener(gameNameLabel, versionLabel, participantsList, idLabel, partyLabel, publicGameLabel,statusLabel, endGameButton, false));
+        waitingGameList.addListSelectionListener(new ServerGUI.GameListSelectionListener(gameNameLabel, versionLabel, participantsList, idLabel, partyLabel, publicGameLabel, statusLabel, endGameButton, true));
     }
  
     /**
-     * Sets up the list with available (not running) games on top.
+     * Sets up the list with available (not running) games on top left.
      */    
     private void setUpAvailableGames()
     {
@@ -460,6 +559,19 @@ public class ServerGUI extends JFrame {
         availableGamesList = new JList(availableGamesContent);
         availableGamesListScrollPane = new JScrollPane(availableGamesList);
         availableGamesListScrollPane.setBorder(BorderFactory.createTitledBorder(new MetalBorders.TextFieldBorder(), "Available Games"));
+    }
+    
+    /**
+     * Sets up the list of users (n top right.<br>
+     * If anonymous login is enbaled, only adHoc created users will be shown in this list.<br>
+     * Otherwise, all persistent users (logged in or not) and doppelgangers (logged in) will be shown.
+     */        
+    private void setUpActiveUsers()
+    {
+        activeUsersContent = new Vector<>();
+        activeUsersList = new JList(activeUsersContent);
+        activeUsersListScrollPane = new JScrollPane(activeUsersList);
+        activeUsersListScrollPane.setBorder(BorderFactory.createTitledBorder(new MetalBorders.TextFieldBorder(), "Active Users"));      
     }
    
     /**
@@ -472,9 +584,56 @@ public class ServerGUI extends JFrame {
     }
     
     /**
+     * Loads all users to the user list (top right)
+     */
+    private void loadUsers()
+    {
+            this.removeAllUsersFromList();
+            for(int i = 0; i < User.users.size(); i++)
+            {
+                if (ServerConfiguration.getInstance().getIsAnonymousLoginAllowed() == true)
+                {
+                    if (User.users.get(i).isNonPersistentUser() == true)
+                    {
+                        this.addUserToList(User.users.get(i)); // Add only non-persistent users
+                    }
+                }
+                else
+                {
+                    this.addUserToList(User.users.get(i)); // Add all users
+                }
+            }
+    }
+      
+    /**
+     * Handles the click on the settings button
+     */
+    private class SettingsAction implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SettingsWindow sw = new SettingsWindow();
+            sw.setVisible(true);
+            loadUsers();                                                        // reload all users after the settings
+        }
+    }
+    
+    /**
+     * Handles the click on the user management button
+     */
+    private class UserSettingsAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UserSettingsWindow sw = new UserSettingsWindow();
+            sw.setVisible(true);                                                         
+        }
+    
+}
+    
+    /**
      * Handles the click event on the close button
      */
-    private static class CloseServerAction implements ActionListener {
+    private class CloseServerAction implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {      
@@ -492,59 +651,82 @@ public class ServerGUI extends JFrame {
      * Handles user interaction in the game list. Shows current information
      * about the selected game and allows to use certain actions
      */
-    private static class GameListSelectionListener implements ListSelectionListener {
+    private class GameListSelectionListener implements ListSelectionListener {
 
         private final JLabel gameNameLabel;
         private final JList participantsList;
         private final JLabel idLabel;
         private final JLabel partyLabel;
+        private final JLabel publicGamelabel;
         private final JLabel statusLabel;
+        private final JLabel versionLabel;
         private final JButton endGameButton;
         private boolean waiting;
 
-        private GameListSelectionListener(JLabel gameNameLabel, JList participantsList, JLabel idLabel, JLabel partyLabel, JLabel statusLabel, JButton endGameButton, boolean waiting) {
+        private GameListSelectionListener(JLabel gameNameLabel, JLabel versionLabel, JList participantsList, JLabel idLabel, JLabel partyLabel, JLabel publicGameLabel, JLabel statusLabel, JButton endGameButton, boolean waiting) {
             this.idLabel = idLabel;
+            this.versionLabel = versionLabel;
             this.gameNameLabel = gameNameLabel;
             this.participantsList = participantsList;
             this.partyLabel = partyLabel;
+            this.publicGamelabel = publicGameLabel;
             this.statusLabel = statusLabel;
             this.endGameButton = endGameButton;
             this.waiting = waiting;
         }
-
+        
         @Override
         public void valueChanged(ListSelectionEvent e) {
             int index;
             if (waiting == true)
             {
                 index = waitingGameList.getSelectedIndex();
-                statusLabel.setText("Status:      Waiting") ;
+                gameList.clearSelection();
+                waitingGameList.setSelectedIndex(index);
+                statusLabel.setText("Status:           Waiting") ;
+                
             }
             else
             {
                 index = gameList.getSelectedIndex();
-                statusLabel.setText("Status:      Active") ;
+                waitingGameList.clearSelection();
+                gameList.setSelectedIndex(index);
+                statusLabel.setText("Status:           Active") ;
             }
-            ServerGUI.selectedGame = ServerGUI.getGameFromListByListIndex(index, waiting);  // waiting indicates from which list the value is
+            ServerGUI.getInstance().selectedGame = ServerGUI.getInstance().getGameFromListByListIndex(index, waiting);  // waiting indicates from which list the value is
             DefaultListModel model = (DefaultListModel)participantsList.getModel();
             model.removeAllElements();            
-            if(index != -1){
+            if(index != -1)
+            {
+                if (selectedGame.getVersionString() == null)
+                {
+                    versionLabel.setText("Version:         Unversioned");
+                }
+                else
+                {
+                    versionLabel.setText("Version:         " + selectedGame.getVersionString());
+                }
                 endGameButton.setEnabled(true);
-            idLabel.setText("ID:              " + Long.toString(selectedGame.getId()));
-            gameNameLabel.setText("Game:        " + selectedGame.getGameName());
-            partyLabel.setText("Party name:  " + selectedGame.getPartyName());
+                idLabel.setText("ID:                  " + Long.toString(selectedGame.getId()));
+                gameNameLabel.setText("Game:            " + selectedGame.getGameName());
+                partyLabel.setText("Party name:  " + selectedGame.getPartyName());
+                publicGameLabel.setText("Public party:  " + Boolean.toString(!selectedGame.isPrivateGame()));
 
-            for (Player p : selectedGame.getPlayers()) {
-                model.addElement(p.getName() + " (ID:" + p.getId() +")");
-            }
-            //participantsLabel.setText(participants);
-            }else{
+                for (Player p : selectedGame.getPlayers()) {
+                    model.addElement(p.getName() + " (ID:" + p.getId() +")");
+                }
+                //participantsLabel.setText(participants);
+            }else
+            {
                 endGameButton.setEnabled(false);
+                statusLabel.setText("Status:           ") ;
                 idLabel.setText("ID:              " );
                 gameNameLabel.setText("Game:        ");
+                versionLabel.setText("Version:        ");
                 partyLabel.setText("Party name:  ");
+                publicGameLabel.setText("Public party:  ");
             }
         }
     }
-}
+    }
     

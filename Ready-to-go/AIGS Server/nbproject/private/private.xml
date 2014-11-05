@@ -2,16 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gui/ServerGUI.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/GameLoader.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/communication/ServerCommunication.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/Main.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/ServerConfiguration.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/ReloadClassesAction.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/ShowLogsAction.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/AIGSConsoleHandler.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/RecompileClassesAction.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

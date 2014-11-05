@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * effect on the game.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "FieldClickMessage")
 public class FieldClickMessage extends Message {

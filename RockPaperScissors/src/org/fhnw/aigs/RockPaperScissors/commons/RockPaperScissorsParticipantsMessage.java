@@ -10,6 +10,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * Dies wird zur Darstellung des Gegnernamens benötigt und am Anfang des Spiels enmalig übertragen.<br>
  * Aus Message abgeleitete Klasse.
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 @XmlRootElement(name = "RockPaperScissorsParticipantsMessage")                  // Stellt sicher, dass Daten aus dieser Klasse korrekt in XML umgesetzt und versendet werden können (Kommunikation)
 public class RockPaperScissorsParticipantsMessage extends Message

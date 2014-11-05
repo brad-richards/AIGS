@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * aborted etc.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "ForceCloseMessage")
 public class ForceCloseMessage extends Message {

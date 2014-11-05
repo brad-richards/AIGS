@@ -5,6 +5,7 @@ import org.fhnw.aigs.commons.Player;
 /**
  * This class is the logical representation of a Field in TicTacToe.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class TicTacToeField {
    

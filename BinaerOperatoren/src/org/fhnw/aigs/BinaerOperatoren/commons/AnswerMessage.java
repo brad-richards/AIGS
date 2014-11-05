@@ -7,6 +7,7 @@ import org.fhnw.aigs.commons.communication.Message;
 /**
  * Sends the answer typed into the text box to the server.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "AnswerMessage")
 public class AnswerMessage extends Message {

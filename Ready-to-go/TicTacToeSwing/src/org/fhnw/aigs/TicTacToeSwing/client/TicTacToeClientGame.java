@@ -11,8 +11,11 @@ import org.fhnw.aigs.commons.communication.Message;
 import org.fhnw.aigs.commons.communication.PlayerChangedMessage;
 
 /**
- * The TicTacToe game on the client side.
- * @author Matthias Stöckli
+ * The TicTacToe game on the client side.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Minor changes due to update of AIGSBaseClient and AIGSCommons
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1
  */
 public class TicTacToeClientGame extends ClientGame {
 
@@ -28,7 +31,7 @@ public class TicTacToeClientGame extends ClientGame {
      * @param gameMode The game mode.
      */
     public TicTacToeClientGame(String gameName, GameMode gameMode) {
-        super(gameName, gameMode);
+        super(gameName, "v1.1", gameMode);
     }
 
     /**

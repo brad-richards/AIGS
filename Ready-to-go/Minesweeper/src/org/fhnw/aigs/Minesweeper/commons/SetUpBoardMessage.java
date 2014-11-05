@@ -12,6 +12,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * process of the "setUpFields" method.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "SetMineCountMessage")
 public class SetUpBoardMessage extends Message {

@@ -10,6 +10,7 @@ import org.fhnw.aigs.commons.Player;
  * sent to all clients.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "FieldChangedMessage")
 public class FieldChangedMessage extends Message {

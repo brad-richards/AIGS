@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.*;
  * this message - it must be implemented in all clients and games.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "GameEndsMessage")
 public class GameEndsMessage extends Message {

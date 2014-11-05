@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * This message is sent to a client when the server receives an invalid input.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "BadInputMessage")
 public class BadInputMessage extends Message {

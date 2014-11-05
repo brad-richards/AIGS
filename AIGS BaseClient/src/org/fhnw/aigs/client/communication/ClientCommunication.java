@@ -18,10 +18,13 @@ import org.fhnw.aigs.commons.communication.IdentificationResponseMessage;
  * This class is responsible for everything related to the network communication
  * to the server. Due to the fact that the class uses the Singleton Pattern, it
  * is not possible to instantiate ClientCommunication directly. In order to get
- * to an instance, use <b>getInstance()</b> instead.
- *
+ * to an instance, use <b>getInstance()</b> instead.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.1.1 Minor changes due to changes in other clssses (dependencies)
+ * 
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version v1.1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public class ClientCommunication implements Runnable {
 
@@ -278,7 +281,8 @@ public class ClientCommunication implements Runnable {
             Settings.tryLoadSettings(true); // Opens the settings window if no settings available
         }
             // Sends an identification to the Server over the new connection
-            IdentificationMessage identificationMessage = new IdentificationMessage(Settings.getInstance().getUsername(), Settings.getInstance().getIdentificationCode());
+            IdentificationMessage identificationMessage = new IdentificationMessage(Settings.getInstance().getUsername(), Settings.getInstance().getPassword(),Settings.getInstance().getDisplayname());
+            
             clientGame.sendMessageToServer(identificationMessage);
             Logger.getLogger(ClientCommunication.class.getName()).log(Level.INFO, "Sent identification!");        
 

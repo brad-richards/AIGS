@@ -12,19 +12,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.application.Platform;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.fhnw.aigs.client.GUI.LoadingWindow;
+import org.fhnw.aigs.client.GUI.SetupWindow;
 import org.fhnw.aigs.client.GUI.SettingsWindow;
 import org.fhnw.aigs.client.gameHandling.ClientGame;
+import org.fhnw.aigs.commons.GameMode;
+import org.fhnw.aigs.commons.JoinType;
 import org.fhnw.aigs.commons.Player;
 import org.fhnw.aigs.commons.XMLHelper;
 import org.fhnw.aigs.commons.communication.BadInputMessage;
 import org.fhnw.aigs.commons.communication.ExceptionMessage;
 import org.fhnw.aigs.commons.communication.ForceCloseMessage;
 import org.fhnw.aigs.commons.communication.IdentificationResponseMessage;
+import org.fhnw.aigs.commons.communication.JoinResponseMessage;
 import org.fhnw.aigs.commons.communication.KeepAliveMessage;
 import org.fhnw.aigs.commons.communication.Message;
+import org.fhnw.aigs.commons.communication.NotifyMessage;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,10 +40,13 @@ import org.xml.sax.SAXException;
  * This class is responsible for parsing and handling all messages sent to the
  * client. In some way it is <b>the</b> most important class. It consists of two
  * parts:<br>
- * Message receiand message handling.
+ * <ul><li>Message receving</li><li>Message handling</li></ul><br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.2 Added new messages and depending handling
  *
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.2 (Raphael Stoeckli, 23.10.2014)
  */
 public class ClientMessageBroker implements Runnable {
 
@@ -104,6 +114,9 @@ public class ClientMessageBroker implements Runnable {
                 if (parsedMessage instanceof KeepAliveMessage == false) {
                     printMessage(inputString);
                 }
+            //    if (parsedMessage instanceof GameStartMessage) {
+            //       clientGame.getGameWindow().removeOverlay();
+            //    }
 
                 checkForNonGameMessages(parsedMessage);
 
@@ -198,6 +211,8 @@ public class ClientMessageBroker implements Runnable {
      * <li>{@link ForceCloseMessage}</li>
      * <li>{@link KeepAliveMessage}</li>
      * <li>{@link IdentificationResponseMessage}</li>
+     * <li>{@link JoinResponseMessage}</li>
+     * <li>{@link NotifyMessage}</li>
      * <li>{@link ExceptionMessage}</li>
      * <li>{@link BadInputMessage}</li>
      * </ul>
@@ -219,8 +234,90 @@ public class ClientMessageBroker implements Runnable {
             handleExceptionMessage(parsedMessage);
         } else if (m instanceof BadInputMessage) {
             handleBadInputMessage(parsedMessage);
+        } else if (m instanceof NotifyMessage) {
+            handleNotifyMessage(parsedMessage);
+        } else if (m instanceof JoinResponseMessage) {
+            handleJoinResponseMessage(parsedMessage);
         }
     }
+    
+    /**
+     * Handles a notify message from the server. It will only show a message box
+     *
+     * @param parsedMessage The {@link NotifyMessage}.
+     * @since v1.2
+     */
+    private void handleNotifyMessage(Message parsedMessage) {
+        NotifyMessage notifyMessage = (NotifyMessage) parsedMessage;
+        JOptionPane.showMessageDialog(null, notifyMessage.getMessage(), "Message from AIGS server", JOptionPane.INFORMATION_MESSAGE);
+        nonGameMessageReceived = true;        // Was handled  
+    } 
+    
+    /**
+     * Handles a message from the server after a joining operation.<br>
+     * A Message box will only appear if the state is false
+     *
+     * @param parsedMessage The {@link JoinResponseMessage}.
+     * @since v1.2
+     */
+    private void handleJoinResponseMessage(Message parsedMessage) {
+        JoinResponseMessage joinResponse = (JoinResponseMessage) parsedMessage;
+        if (joinResponse.getJoinState() == false)
+        {
+            String caption;
+            if (joinResponse.getJoinType() == JoinType.CreateNewGame)
+            {
+               caption = "Party could not be created"; 
+            }
+            else if (joinResponse.getJoinType() == JoinType.JoinParticularGame)
+            {
+               caption = "Party could not be joined"; 
+            }
+            else
+            {
+                caption = "No party could be joined or created";
+            }
+            JOptionPane.showMessageDialog(null, joinResponse.getMessage(), caption, JOptionPane.INFORMATION_MESSAGE);
+            nonGameMessageReceived = true;        // Was handled
+                Platform.runLater(new Runnable() {                              // Important! UI manipulation must be handled with runLater from another tread
+                @Override
+                public void run() {
+                    clientGame.getGameWindow().setOverlay(new SetupWindow(clientGame));  // Show Setup window
+                    clientGame.getGameWindow().getHeader().setStatusLabelText("");          // Reset State
+                }
+            });  
+            Settings.getInstance().SetGameStop();                               
+        }
+        else //Operation successfull
+        {
+            if (joinResponse.getJoinType() == JoinType.Auto)
+            {
+                if (joinResponse.isGameCreated() == true) // Show overlay
+                {
+                    if (joinResponse.getGameMode() == GameMode.Multiplayer)
+                    {
+                        Platform.runLater(new Runnable() {                      // Important! UI manipulation must be handled with runLater
+                        @Override
+                        public void run() {
+                              //clientGame.getGameWindow().removeOverlay();
+                              clientGame.getGameWindow().setOverlay(new LoadingWindow());  // Show Waiting window
+                              clientGame.getGameWindow().getHeader().setStatusLabelText("Waiting for other players");          // Reset State
+                          }
+                      });                    
+                    }
+                    else // Start Game in Single Player mode
+                    {
+                        Settings.getInstance().SetGameRunning();
+                    }
+                }
+            }
+            else
+            {
+                Settings.getInstance().SetGameRunning();
+            }
+        }
+        
+    }     
 
     /**
      * If the client needs to be closed this method informs the user about the
@@ -271,8 +368,9 @@ public class ClientMessageBroker implements Runnable {
         // Check if the login was successful
         if (identificationResponseMessage.getLoginSuccessful() == false) {
             // Show the settings GUI
+            Settings.getInstance().SetGameStop();
             SettingsWindow identificationGUI = new SettingsWindow();
-           identificationGUI.setVisible(true);
+            identificationGUI.setVisible(true);
 
             // Change the status label on the identification GUI
             SettingsWindow.notifyOfFailure(identificationResponseMessage.getReason());
@@ -281,16 +379,13 @@ public class ClientMessageBroker implements Runnable {
             // add player based on the identification
             // this cannot be done earlier due to the fact that 
             // the server may have allocated another name to the user
-            Player player = new Player(identificationResponseMessage.getUserName(), false);
+            Player player = new Player(identificationResponseMessage.getLoginName(), identificationResponseMessage.getPlayerName(), false);
             clientGame.setPlayer(player);
             Logger.getLogger(ClientMessageBroker.class.getName()).log(Level.INFO, "Identification successful - new Player {0}", player.toString());
-            clientGame.onGameReady();                   // Notify client game about the established connection         
-            nonGameMessageReceived = true;        // Was handled
+            clientGame.onGameReady();                                           // Notify client game about the established connection         
+            nonGameMessageReceived = true;                                      // Was handled
         }
     }    
-    
-    
-    
 
     /**
      * This method handles {@link ExceptionMessage}s. They are sent to the

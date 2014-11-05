@@ -24,6 +24,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * graphics.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public abstract class BaseBoard extends GridPane {
 

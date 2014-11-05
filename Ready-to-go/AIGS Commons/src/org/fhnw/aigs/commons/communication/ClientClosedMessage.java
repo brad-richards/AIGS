@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * will terminate the game.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "ClientClosedMessage")
 public class ClientClosedMessage extends Message {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.fhnw.aigs.server.gameHandling;
 
 import java.awt.event.ActionEvent;
@@ -24,7 +19,8 @@ import org.fhnw.aigs.server.gui.ServerGUI;
  * <br>v1.1 Refactored to 'RecompileClassesAction'
  * <br>v1.2 Bugfixes
  * <br>v1.3 Added some error handling to the compiling process
- * @version 1.3 (Raphael Stoeckli, 07.10.2014)
+ * <br>v1.4 Minor changes due to changes on the GUI
+ * @version 1.4 (Raphael Stoeckli, 15.10.2014)
  */
 public class RecompileClassesAction implements ActionListener {
 
@@ -32,6 +28,11 @@ public class RecompileClassesAction implements ActionListener {
     private JList list;
     private boolean GUImode = false;
     
+    /**
+     * Constructor called from the GUI
+     * @param content Reference to the list of games 
+     * @param list Reference to JList of available games in ithe GUI
+     */
     public RecompileClassesAction(Vector<String> content, JList list) // Button
     {
         this.content = content;
@@ -40,6 +41,9 @@ public class RecompileClassesAction implements ActionListener {
         actionPerformed(null);
     }
     
+    /**
+     * Constructor called from the console
+     */
     public RecompileClassesAction() // Console
     {
         this.GUImode = false;
@@ -98,18 +102,18 @@ public class RecompileClassesAction implements ActionListener {
         }
         for (int i = 0; i < GameManager.waitingGames.size(); i++) {
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
-                ServerGUI.removeGameFromList(GameManager.waitingGames.get(i), true);                
+                ServerGUI.getInstance().removeGameFromList(GameManager.waitingGames.get(i), true);                
             }
             GameManager.terminateGame(GameManager.waitingGames.get(i), "Server restarts.");
 
         }
         for (int i = 0; i < GameManager.runningGames.size(); i++) {
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
-                ServerGUI.removeGameFromList(GameManager.runningGames.get(i), false);
+                ServerGUI.getInstance().removeGameFromList(GameManager.runningGames.get(i), false);
             }
             GameManager.terminateGame(GameManager.runningGames.get(i), "Server restarts.");
         }
-
+        User.removeAllNonPersistentUsers();                                     // Removes all previously created users
     }
   
     /**

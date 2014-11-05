@@ -5,26 +5,34 @@ import javax.xml.bind.annotation.*;
 /**
  * This message will be sent by the clients in order to identificate
  * /authentificate. The user sends his or her user name and a corresponding
- * identificationCode. The server will then checks the user name against the
- * identification code and other factors (such as unique user name), then a
- * corresponding {@link IdentificationResponseMessage} will be sent.<br>
+ password. The server will then checks the user name against the
+ identification code and other factors (such as unique user name), then a
+ corresponding {@link IdentificationResponseMessage} will be sent.<br>
  * There is a test user called "test" having the
- * {@link IdentificationMessage#identificationCode} "1".
+ * {@link IdentificationMessage#password} "1".<br>
+ * v1.0 Initial release<br>
+ * v1.1 added login name (split up of name into display and login name)
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stockli, 20.10.2014)
  */
 @XmlRootElement(name = "IdentificationMessage")
 public class IdentificationMessage extends Message {
 
     /**
-     * The (proposed) user name, e.g. "pascal.fischer".
+     * The (proposed) user name, e.g. "pascal.fischer". If login is disabled on server, this name can be arbitrary
      */
-    private String userName;
+    private String loginName;
     /**
-     * The identification code (provided). It can be seen in the server's folder
-     * conf/usersXml.xml.
+     * The identification code / password (provided). It can be seen in the server's folder
+     * conf/usersXml.xml. If login is disabled, this value can be empty.
      */
-    private String identificationCode;
+    private String password;
+    
+    /**
+     * The displayed name of the player
+     */
+    private String playerName;
 
     /**
      * Empty constructor. This is needed for JAXB parsing.
@@ -35,41 +43,60 @@ public class IdentificationMessage extends Message {
     /**
      * Creates a new instance of IdentificationMessage.
      *
-     * @param name The user's name.
-     * @param identificationCode The user's identification Code (provided).
+     * @param loginName The user's loginName
+     * @param playerName The user displayed name
+     * @param password The user's password
      */
-    public IdentificationMessage(String name, String identificationCode) {
-        this.userName = name;
-        this.identificationCode = identificationCode;
+    public IdentificationMessage(String loginName, String password, String playerName) {
+        this.loginName = loginName;
+        this.playerName = playerName;
+        this.password = password;
     }
 
     /**
-     * See {@link identificationCode}
+     * See {@link password}
      */
-    @XmlElement(name = "IdentificationCode")
-    public String getIdentificationCode() {
-        return identificationCode;
+    @XmlElement(name = "Password")
+    public String getPassword() {
+        return password;
     }
 
     /**
-     * See {@link userName}
+     * See {@link loginName}
      */
-    @XmlElement(name = "UserName")
-    public String getUserName() {
-        return userName;
+    @XmlElement(name = "LoginName")
+    public String getLoginName() {
+        return loginName;
+    }
+    
+    /**
+     * See {@link playerName}
+     */
+    @XmlElement(name = "PlayerName")
+    public String getPlayerName() {
+        return playerName;
     }
 
     /**
-     * See {@link identificationCode}
+     * See {@link password}
      */
-    public void setIdentificationCode(String identificationCode) {
-        this.identificationCode = identificationCode;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
-     * See {@link userName}
+     * See {@link loginName}
      */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setLoginName(String userName) {
+        this.loginName = userName;
+    }
+    
+     /**
+     * See {@link playerName}
+     */   
+    public void setPlayerName(String playerName)
+    {
+        this.playerName = playerName;
+                
     }
 }

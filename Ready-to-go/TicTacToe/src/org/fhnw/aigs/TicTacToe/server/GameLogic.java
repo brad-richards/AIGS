@@ -18,8 +18,10 @@ import org.fhnw.aigs.TicTacToe.commons.TicTacToeSymbol;
  * in the variables xFields and yFields which are set in the constructor. <br>
  * The game logic contains a multidimensional array of TicTacToeFields which
  * represent the fields, see {@link GameLogic#ticTacToeFields}.<br>
- *
- * @author Matthias Stöckli
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes (package)<br>
+ * v1.1.1 Minor changes
+ * @author Matthias Stöckli (v1.0)
  */
 public class GameLogic extends Game {
 
@@ -44,7 +46,7 @@ public class GameLogic extends Game {
      * Don't forgett to set the same game name in the class {@link org.fhnw.aigs.TicTacToe.client.TicTacToeMain} in the package 'client'.
      */
     public GameLogic() {
-        super("TicTacToe", 2); // VERY IMPORTANT! The game name must be unique on the server (only onece 'TicTacToe')
+        super("TicTacToe", "v1.1.1", 2); // VERY IMPORTANT! The game name must be unique on the server (only onece 'TicTacToe')
         xFields = 3;
         yFields = 3;
     }

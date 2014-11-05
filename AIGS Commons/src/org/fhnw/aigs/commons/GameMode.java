@@ -13,6 +13,7 @@ package org.fhnw.aigs.commons;
  * </ul>
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public enum GameMode {
 

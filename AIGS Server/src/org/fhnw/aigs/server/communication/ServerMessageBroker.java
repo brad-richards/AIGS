@@ -17,10 +17,13 @@ import org.fhnw.aigs.server.gameHandling.*;
  * assigned to every client connection. The incoming messages will be parsed and
  * analyzed. System messages such as {@link ClientClosedMessage}s will be
  * handled in this class. All other messages will be forwarded to the game
- * assigned to the game connected to the ServerMessageBroker.
+ * assigned to the game connected to the ServerMessageBroker.<br>
+ * v1.0   Initial release<br>
+ * v1.1   Functional changes<br>
+ * v1.1.1 Minor changes (due to changes in other classes)
  *
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.1.1 (Raphael Stoeckli, 27.10.2014)
  */
 public class ServerMessageBroker implements Runnable {
 
@@ -99,7 +102,7 @@ public class ServerMessageBroker implements Runnable {
                     printMessage(inputString);
                 }
                 checkForNonGameMessages(parsedMessage);
-
+                
                 // Stop the processing if a non game message was
                 // handled or if there is no game or the message is not valid.
                 if (nonGameMessageReceived || game == null) {
@@ -181,7 +184,7 @@ public class ServerMessageBroker implements Runnable {
         // of the current game.
         ClassLoader loader = getClassLoader();
 
-        // Try to load and parse the Message Class dynamically by the name provided
+        // Try to load and parse the Message Class dynamically by the loginName provided
         // by the attribute "classPath" which is part of every message.
         try {
             Class messageClass = Class.forName(messageClassPath, true, loader);
@@ -212,7 +215,7 @@ public class ServerMessageBroker implements Runnable {
         Document DOMDocument;
         try {
             DOMDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
-            // Read the attribute "classPath" of the sent XML. It represents the qualified name of the class
+            // Read the attribute "classPath" of the sent XML. It represents the qualified loginName of the class
             // e.g. "org.fhnw.aigs.commons.TicTacToe.FieldClickMessage" which points to the class "FieldClickMessage".
             return DOMDocument.getDocumentElement().getAttribute("FullyQualifiedClassName");
 
@@ -277,8 +280,9 @@ public class ServerMessageBroker implements Runnable {
      */
     private void handledentificationMessage(Message parsedMessage) {
         IdentificationMessage identificationMessage = (IdentificationMessage) parsedMessage;
-        String name = identificationMessage.getUserName();
-        String identificationCode = identificationMessage.getIdentificationCode();
+        String loginName = identificationMessage.getLoginName();
+        String password = identificationMessage.getPassword();
+        String playerName = identificationMessage.getPlayerName();
 
         // Checks whether the server is running as local host or if the option
         // "IsMultiLoginAllowed" is set to true.
@@ -291,15 +295,11 @@ public class ServerMessageBroker implements Runnable {
         }
 
         // Identify the user and create a player based on the message.
-        IdentificationResponseMessage identificationResponseMessage = User.identify(name, identificationCode, isMultiLoginAllowed);
-        this.player = new Player(identificationResponseMessage.getUserName(), false);
+        IdentificationResponseMessage identificationResponseMessage = User.identify(loginName, password, playerName, isMultiLoginAllowed);
+        this.player = new Player(identificationResponseMessage.getLoginName(), identificationResponseMessage.getPlayerName(), false);
         this.player.setSocket(socket);
-
-        identificationResponseMessage.setIdentificationCode(identificationCode);
         identificationResponseMessage.send(socket, player);
         nonGameMessageReceived = true;        // Was handled
-
-
     }
 
     /**
@@ -321,7 +321,6 @@ public class ServerMessageBroker implements Runnable {
         GameManager.terminateGame(game, player, clientClosedMessage.getReason());
         connectionOpen = true;
         nonGameMessageReceived = true;
-
     }
 
     /**

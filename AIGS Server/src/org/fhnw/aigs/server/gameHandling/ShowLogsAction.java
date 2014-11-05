@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.fhnw.aigs.server.gameHandling;
 
 import java.awt.Desktop;
@@ -13,10 +8,13 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.fhnw.aigs.server.gui.ServerGUI;
 
 /**
- * Opens the log file folder. 
+ * Opens the log file folder.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Handling changed
+ * @version v1.1 (Raphael Stoeckli, 28.10.2014)
+ * @author Matthias Stöckli (v1.0)
  */
 public class ShowLogsAction implements ActionListener {
 
@@ -30,7 +28,15 @@ public class ShowLogsAction implements ActionListener {
      */
     public void showLogs(){
         try {
-            File logFolder = new File(ServerConfiguration.getInstance().getLogDirectory() + "/");
+            File logFolder = null;
+            if(ServerConfiguration.getInstance().getTempLogsDirectory().equals(""))
+            {
+               logFolder = new File(ServerConfiguration.getInstance().getLogDirectory() + "/"); 
+            }
+            else
+            {
+              logFolder = new File(ServerConfiguration.getInstance().getTempLogsDirectory()+ "/"); // use old value until restart
+            }
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().open(logFolder);
             } else {

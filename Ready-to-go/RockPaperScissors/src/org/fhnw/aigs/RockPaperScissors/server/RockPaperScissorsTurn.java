@@ -7,6 +7,7 @@ import org.fhnw.aigs.commons.Player;
 /**
  * Klasse zur Darstellung des aktuellen Zuges (Turn) eines Spielers. Objekte dieser Klasse werden auf dem Server für die Verwaltung der Züge benötigt
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 public class RockPaperScissorsTurn {
     

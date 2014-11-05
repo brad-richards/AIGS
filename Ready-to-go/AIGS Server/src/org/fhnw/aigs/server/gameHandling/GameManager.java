@@ -14,9 +14,13 @@ import org.fhnw.aigs.server.gui.ServerGUI;
 /**
  * This class manages all games. It creastes new games, lets players join games,
  * loads Game classes and terminates games. Once a game has been initialized,
- * the GameManager does not do much for the game, expect terminating it.
+ * the GameManager does not do much for the game, expect terminating it.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Features added<br>
+ * v1.2 Major changes in handlung and additional features
  *
  * @author Matthias Stöckli
+ * @version v1.2 (Raphael Stoeckli, 27.10.2014)
  */
 public class GameManager {
 
@@ -50,33 +54,123 @@ public class GameManager {
         Game joinedGame;
         String gameName = joinMessage.getGameName();
         GameMode gameMode = joinMessage.getGameMode();
-
-        // If the player wants to play a single player party or if there are no
-        // games available, create a new game/party.
-        if (gameMode == GameMode.SinglePlayer || waitingGames.isEmpty()) {
-            joinedGame = createNewGame(gameName, gameMode, partyName, player);
-            if (joinedGame == null) {
-                return null;
+        JoinType joinType = joinMessage.getJoinType();
+        String message = "";
+        boolean gameCreated = false;
+        
+        if ((joinType == JoinType.CreateNewGame || joinType == JoinType.CreateNewPrivateGame) && gameMode != GameMode.SinglePlayer) // New (Multiplayer)
+        {
+            Game existing = checkIfPartyAlreadyExists(gameName, partyName);
+            if (existing != null) // Game already exists
+            {
+                Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not create the party '{0}' of the type {1}, because this party already exists.", new Object[]{partyName, gameName});
+                JoinResponseMessage response = new JoinResponseMessage(joinType, gameMode, false, false, "The party '" + partyName + "' could not be created, because this party name already exists");
+                response.send(player.getSocket(), player);    
+               
+                return null; // Send Message to user: Game with this name can not be creted because it already exists
             }
-            joinedGame.addPlayer(player);
-            Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party!", new Object[]{player.getName(), gameName});
-        } // If the player specified a party's name, join a party with that name.
-        else if (joinMessage.getPartyName() != null) {
-            joinedGame = joinParty(gameName, gameMode, player, partyName);
-            if (joinedGame == null) {
-                return null;     // <-- For exception handling purposes.
+            else
+            {
+                    joinedGame = createNewGame(gameName, gameMode, partyName, player);
+                    if (joinedGame != null)
+                    {
+                        if (joinType == JoinType.CreateNewPrivateGame)
+                        {
+                            joinedGame.setPrivateGame(true);
+                        }
+                        else
+                        {
+                            joinedGame.setPrivateGame(false);
+                        }
+                        joinedGame.addPlayer(player);
+                        Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                        gameCreated = true;
+                    }
             }
-            Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined the party {1} in multiplayer {2}", new Object[]{player.getName(), partyName, gameName});
-        } else {
-            // This is the most common use case - if the player did not specify
-            // a party name, join a random game of the same type.            
-            joinedGame = joinRandomGame(gameName, gameMode, player);
-            if (joinedGame == null) {
-                return null;     // <-- For exception handling purposes.
-            }
-            Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined a random party in multiplayer {1}", new Object[]{player.getName(), gameName});
         }
-
+        else if (joinType == JoinType.JoinParticularGame && gameMode != GameMode.SinglePlayer) // Existing (Multiplayer) --> Private game
+        {
+            Game existing = checkIfPartyAlreadyExists(gameName, partyName);
+            if (existing == null) // Game does not exist
+            {
+                boolean isRunning = checkIfPartyIsRunning(gameName, partyName);
+                JoinResponseMessage response = null;
+                if (isRunning == true)
+                {
+                    Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party has already started.", new Object[]{partyName, gameName});
+                    response = new JoinResponseMessage(joinType, gameMode,false, false, "The party '" + partyName + "' could not be joined, because it has already started");     
+                }
+                else
+                {
+                    Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party does not exist.", new Object[]{partyName, gameName});
+                    response = new JoinResponseMessage(joinType, gameMode,false, false, "The party '" + partyName + "' could not be joined, because this party name does not exist");                
+                }
+                response.send(player.getSocket(), player);             
+                return null; // Send Message to user: No game with this name exists
+            }
+            else
+            {
+                joinedGame = joinParty(gameName, gameMode, player, partyName, false);
+                if (joinedGame != null)
+                {
+                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined the existing {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                }
+                else
+                {
+                     message = "Could not join the party";
+                }
+            }            
+        }
+        else // Join or create (public game) + Singleplayer
+        {
+            if (gameMode == GameMode.SinglePlayer || checkIfPartyIsWaiting(gameName, true) == false) 
+            {
+                partyName = getRandomPartyName(gameName, partyName);            // Update party name
+                joinedGame = createNewGame(gameName, gameMode, partyName, player);
+                if (joinedGame != null)
+                {
+                    joinedGame.addPlayer(player);
+                    if (gameMode == GameMode.SinglePlayer)
+                    {
+                        User aiDummy = new User(gameName + "-AI", "");          // Create a AI dummy for visual purpose
+                        aiDummy.setAI(true);
+                        User.addUserToUserList(aiDummy);                        // Add dummy AI user to User list
+                        joinedGame.setPrivateGame(true);                        // Single player is always private
+                    }
+                    else
+                    {
+                        joinedGame.setPrivateGame(false);                       // Create a public game
+                    }
+                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                    gameCreated = true;
+                }
+                else
+                {
+                     message = "Could not create the party";
+                     gameCreated = false;
+                }
+            }
+            else // Multiplayer or waiting games (public)
+            {              
+                joinedGame = joinRandomGame(gameName, gameMode, player);
+                if (joinedGame != null)
+                {
+                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined a random party in multiplayer {1}", new Object[]{player.getName(), gameName});                    
+                }
+                else
+                {
+                     message = "Could not join a random party";
+                }
+                gameCreated = false;
+            }
+        }
+        
+        if (joinedGame == null)
+        {
+            JoinResponseMessage response = new JoinResponseMessage(joinType, gameMode,false, false, message);                
+            response.send(player.getSocket(), player);             
+            return null;
+        }
         // Check if the game has enough participants, if so, remove it from the
         // waiting games list and add it to the running games list.
         if (joinedGame.hasEnoughParticipants()) {
@@ -85,10 +179,9 @@ public class GameManager {
 
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
                 // Add the game to the GUI
-                ServerGUI.addGameToList(joinedGame,false);
-                ServerGUI.removeGameFromList(joinedGame, true);
+                ServerGUI.getInstance().addGameToList(joinedGame,false);
+                ServerGUI.getInstance().removeGameFromList(joinedGame, true);
             }
-
             // If there is an exception in the initialization process, report it
             try {
                 joinedGame.initialize();
@@ -99,22 +192,28 @@ public class GameManager {
             }
             Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "Initialized {0} (ID {1})", new Object[]{gameName, joinedGame.getId()});
         }
-
+        JoinResponseMessage response = new JoinResponseMessage(joinType, true, gameCreated);                
+        response.send(player.getSocket(), player); 
         return joinedGame;
     }
 
     /**
-     * Joins the first game in the list of waiting games with the same gameName.
+     * Joins the first public game in the list of waiting games with the same gameName.
      *
      * @param gameName The game's name.
      * @param gameMode The game mode.
      * @param player The player who wants to join the game.
      * @return The game to be joined.
      */
-    private static Game joinRandomGame(String gameName, GameMode gameMode, Player player) {
-        for (int i = 0; i < waitingGames.size(); i++) {
+    private static Game joinRandomGame(String gameName, GameMode gameMode, Player player)
+    {
+        for (int i = 0; i < waitingGames.size(); i++)
+        {
             Game waitingGame = waitingGames.get(i);
-
+            if (waitingGame.isPrivateGame() == true) // Skip all private games
+            {
+                continue;
+            }
             // Check for running games of specified type and join it, if it matches
             if (waitingGame.getGameName().equals(gameName)) {
                 waitingGame.addPlayer(player);
@@ -125,31 +224,130 @@ public class GameManager {
     }
 
     /**
-     * Join a named game, called "party". It is possible to add a party name to
-     * a {@link JoinMessage}. The name will then be used to join other players
-     * who chose the same party name. The purpose of this method is to allow
-     * players to play the game with an exactly defined set of people. This
-     * could easily be used to build a lobby-like environment.
+     * Joins a named game, with the defined party name.
+     * The purpose of this method is to allow players to play the game with an
+     * exactly defined set of people. This could easily be used to build a
+     * lobby-like environment.
      *
      * @param gameName The game's name.
      * @param gameMode The game mode.
      * @param player The player who wants to join the party/game.
      * @param partyName The name of the party.
-     * @return The game to be joined.
+     * @param createNew If true, a new game will be crated if the party with the defined party name was not found. Otherwise null will be returned
+     * @return The game to be joined or null if no game to join (see createNew) was found.
      */
-    private static Game joinParty(String gameName, GameMode gameMode, Player player, String partyName) {
-        for (int i = 0; i < waitingGames.size(); i++) {
-            Game waitingGame = waitingGames.get(i);
+    private static Game joinParty(String gameName, GameMode gameMode, Player player, String partyName, boolean createNew) {
+        Game waitingGame = checkIfPartyAlreadyExists(gameName, partyName);       
+        if (waitingGame == null)
+        {
+            if (createNew == true)
+            {
+                return createNewGame(gameName, gameMode, partyName, player);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            waitingGame.addPlayer(player);
+            return waitingGame;
+        }
+    }
+    
+    
+    /**
+     * Gets a free random game name
+     * @param gameName Name of the game (type)
+     * @param template Template to build the party name. A number will appended to the template
+     * @return A unique party name
+     */
+    private static String getRandomPartyName(String gameName, String template)
+    {
+        int counter = 1;
+        String name = template;
+        while(true)
+        {
+            if (checkIfPartyAlreadyExists(gameName, name)!= null) // waiting games
+            {
+                counter++;
+                name = template + "(" + Integer.toString(counter) + ")";
+                continue;
+            }
+            if (checkIfPartyIsRunning(gameName, name) == true) // running games
+            {
+                counter++;
+                name = template + "(" + Integer.toString(counter) + ")";
+                continue;
+            }
+            break;
+        }
+        return name;
+    }
+    
+    /**
+     * Method to check whether a party of the defined game type currently is waiting. This method is used to find random waiting games.
+     * @param gameName Name of the game (type)
+     * @param onlyPublicGames If true, only public parties will be considered, otherwise all games will be considered
+     * @return True, if at least one party is waiting, otherwise false
+     */
+    private static boolean checkIfPartyIsWaiting(String gameName, boolean onlyPublicGames)
+    {
+        if (waitingGames.isEmpty() == true) { return false; }
+        for (int i = 0; i < waitingGames.size(); i++) 
+        {
+            if (onlyPublicGames == true && waitingGames.get(i).isPrivateGame() == true)
+            {
+                continue;
+            }
+          if (waitingGames.get(i).getGameName().equals(gameName))
+          {
+              return true;
+          }
+        }
+        return false;
+    }    
+    
+    /**
+     * Method to check whether a party of the defined game type and party name currently is running
+     * @param gameName Name of the game (type)
+     * @param partyName Name of the party to check
+     * @return True, if a party with the defined name and type is running, otherwise false
+     */
+    private static boolean checkIfPartyIsRunning(String gameName, String partyName)
+    {
+        for (int i = 0; i < runningGames.size(); i++) 
+        {
+          if (runningGames.get(i).getGameName().equals(gameName) && runningGames.get(i).getPartyName().equals(partyName) )
+          {
+              return true;
+          }
+        }
+        return false;
+    }
+    
+    /**
+     * Method to check whether a party of the defined game type and name is waiting
+     * @param gameName Name of the game (type)
+     * @param partyName Name of the party to check
+     * @return The game object of the defined type and party name if existing (waiting), otherwise null
+     */
+    private static Game checkIfPartyAlreadyExists(String gameName, String partyName)
+    {
+        Game waitingGame;
+          for (int i = 0; i < waitingGames.size(); i++) 
+          {
+            waitingGame = waitingGames.get(i);
 
             // Check for running games of specified type and party name and
             // join it, if it matches.
-            if (waitingGame.getGameName().equals(gameName)
-                    && waitingGame.getPartyName().equals(partyName)) {
-                waitingGame.addPlayer(player);
+            if (waitingGame.getGameName().equals(gameName) && waitingGame.getPartyName().equals(partyName)) 
+            {
                 return waitingGame;
             }
-        }
-        return createNewGame(gameName, gameMode, partyName, player);
+           } 
+          return null;
     }
 
     /**
@@ -173,7 +371,7 @@ public class GameManager {
         
         if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
             // Add the game to the GUI
-            ServerGUI.addGameToList(newGame,true);
+            ServerGUI.getInstance().addGameToList(newGame,true);
         }        
         return newGame;
     }
@@ -251,7 +449,7 @@ public class GameManager {
 
                 if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
                     // Refresh GUI
-                    ServerGUI.removeGameFromList(game, false);
+                    ServerGUI.getInstance().removeGameFromList(game, false);
                     Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());                    
                 }
 
@@ -266,12 +464,13 @@ public class GameManager {
             else if (waitingGames.contains(game)) {
                 waitingGames.remove(game);
                 // Refresh GUI
-                ServerGUI.removeGameFromList(game, true);
+                ServerGUI.getInstance().removeGameFromList(game, true);
                 Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
                 game.removePlayer(terminatingPlayer);
                 ForceCloseMessage forceCloseMessage = new ForceCloseMessage(reason);
                 game.sendMessageToAllPlayers(forceCloseMessage);
             }
+            GameManager.cleanUpUsers();                                         // Clean up user list
         }
     }
 
@@ -304,14 +503,14 @@ public class GameManager {
         if (runningGames.contains(game)) {
             runningGames.remove(game);
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
-                ServerGUI.removeGameFromList(game, false);
+                ServerGUI.getInstance().removeGameFromList(game, false);
             }
             Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());
         } // End game if it is a waiting game.
         else if (waitingGames.contains(game)) {
             waitingGames.remove(game);
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
-                ServerGUI.removeGameFromList(game, true);
+                ServerGUI.getInstance().removeGameFromList(game, true);
             }
             Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
         }
@@ -360,6 +559,78 @@ public class GameManager {
 
         // If there is no player with that name, return false
         return false;
+    }
+    
+    /**
+     * Method to clean up users. All users which are not in a waiting or running 
+     * game will be removed from the static user list
+     */
+    public static void cleanUpUsers()
+    {
+        ArrayList<User> tempUsers = new ArrayList<User>();
+        boolean found;
+        int len = User.users.size(); // This is more efficient than dynamic peeked in for
+        int lenW = waitingGames.size(); // "
+        int lenR = runningGames.size(); // "
+        Game g;
+        User u;
+        String loginName;
+        int j, k, lenP;
+        for(int i = 0; i < len; i++)
+        {
+            u = User.users.get(i);
+            if (u.isNonPersistentUser() == false) { continue; }     // Only remove non persistent users
+            loginName = u.getUserName();
+            found = false;
+            for(j = 0; j < lenW; j++) // Wating games
+            {
+                g = waitingGames.get(j);
+                lenP = g.getPlayers().size();
+                for(k = 0; k < lenP; k++)
+                {
+                    if (g.getPlayers().get(k).getLoginName().equals(loginName))
+                    {
+                       found = true;
+                       break;
+                    }
+                }
+                if (found == true) // No further check needed -> User still active
+                {
+                    break;
+                }
+            }
+            if (found == true) // No further check needed -> User still active
+            {
+                continue;
+            }
+            for(j = 0; j < lenR; j++) // Running games
+            {
+                g = runningGames.get(j);
+                lenP = g.getPlayers().size();
+                for(k = 0; k < lenP; k++)
+                {
+                    if (g.getPlayers().get(k).getLoginName().equals(loginName))
+                    {
+                       found = true;
+                       break;
+                    }
+                }
+                if (found == true) // No further check needed -> User still active
+                {
+                    break;
+                }
+            }
+            if (found == false)
+            {
+                tempUsers.add(u); // Mark the user with this index to remove
+            }
+        }
+        len = tempUsers.size();
+        for(int i = 0; i < len; i++)
+        {
+            u = tempUsers.get(i);
+            User.removeUserFromUserList(u);
+        }
     }
 
     /**

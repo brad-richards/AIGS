@@ -26,6 +26,7 @@ import org.fhnw.aigs.commons.communication.KeepAliveMessage;
  * Server Configuration to "false".
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class KeepAliveManager implements Runnable {
 

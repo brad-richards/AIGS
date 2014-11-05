@@ -9,6 +9,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * This message is used to inform the server about the flagging or unflagging
  * of a field.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "MarkFieldMessage")
 public class MarkFieldMessage extends Message {
@@ -39,20 +40,32 @@ public class MarkFieldMessage extends Message {
         this.positionY = y;
     }
     
+    /**
+     * see {@link MarkFieldMessage#positionX}
+     */
     @XmlElement(name = "X")
     public int getPositionX() {
         return positionX;
     }
 
+    /**
+     * see {@link MarkFieldMessage#positionY}
+     */    
     @XmlElement(name = "Y")
     public int getPositionY() {
         return positionY;
     }
 
+    /**
+     * see {@link MarkFieldMessage#positionX}
+     */    
     public void setPositionX(int positionX) {
         this.positionX = positionX;
     }
 
+    /**
+     * see {@link MarkFieldMessage#positionY}
+     */    
     public void setPositionY(int positionY) {
         this.positionY = positionY;
     }

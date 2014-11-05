@@ -18,6 +18,7 @@ import org.fhnw.aigs.RockPaperScissors.commons.RockPaperScissorsSymbol;
  * Klasse für Definition des Spielfelds.<br>
  * Die Klasse ist von GridPane abgeleitet und wird im AIGS BaseClient eingebaut
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 public class RockPaperScissorsBoard extends GridPane {                          // Der zentrale Teil des Spiels basiert immer auf einem GridPane (bei JavaFX)
     

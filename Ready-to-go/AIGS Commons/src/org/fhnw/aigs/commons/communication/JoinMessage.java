@@ -4,12 +4,16 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.fhnw.aigs.commons.GameMode;
+import org.fhnw.aigs.commons.JoinType;
 
 /**
  * This message is sent to the server when a player wants to join a message.
- * Usually the "startGame" method triggers this message.
+ * Usually the "startGame" method triggers this message.<br>
+ * v1.0 Initial release<br>
+ * v1.1 {@link JoinType} added
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version 1.1 (Raphael Stoeckli, 21.10.2014)
  */
 @XmlRootElement(name = "JoinMessage")
 public class JoinMessage extends Message {
@@ -33,6 +37,16 @@ public class JoinMessage extends Message {
      * willing to join the game.
      */
     private String partyName;
+    
+    /**
+     * The type of joining a game. The server will interprete this value and:<br>
+     * a) join a random waiting game or create a new one (Auto)<br>
+     * b) Create an new private game with the party name (CreateNewPrivateGame)<br>
+     * c) Create an new public game with the party name (CreateNewGame)<br>
+     * d) Join a particular game with the defined party name (JoinParticularGame)
+     * @since v1.1
+     */
+    private JoinType joinType;
 
     /**
      * Empty constructor. This is needed for JAXB parsing.
@@ -47,12 +61,15 @@ public class JoinMessage extends Message {
      *
      * @param gameName Name of the game, e.g. TicTacToe
      * @param gameMode The {@link GameMode}. It can either be SinglePlayer,
+     * @param joinType The {@link JoinType}
      * MultiPlayer or Test.
      */
-    public JoinMessage(String gameName, GameMode gameMode) {
+    public JoinMessage(String gameName, GameMode gameMode, JoinType joinType) {
         this.gameName = gameName;
         this.joinTime = new Date();
         this.gameMode = gameMode;
+        this.joinType = joinType;
+        this.partyName = "Party";
     }
 
     /**
@@ -64,10 +81,12 @@ public class JoinMessage extends Message {
      *
      * @param gameName Name of the game, e.g. TicTacToe
      * @param gameMode The {@link GameMode}. It can either be SinglePlayer,
+     * @param partyName The name of the party
+     * @param joinType The {@link JoinType}
      * MultiPlayer or Test.
      */
-    public JoinMessage(String gameName, GameMode gameMode, String partyName) {
-        this(gameName, gameMode);
+    public JoinMessage(String gameName, GameMode gameMode, String partyName, JoinType joinType) {
+        this(gameName, gameMode, joinType);
         this.partyName = partyName;
     }
 
@@ -109,6 +128,14 @@ public class JoinMessage extends Message {
     public String getPartyName() {
         return partyName;
     }
+    
+    /**
+     * See {@link joinType}.
+     */    
+    @XmlElement(name = "JoinType")
+    public JoinType getJoinType() {
+        return joinType;
+    }
 
     /**
      * See {@link joinTime}.
@@ -130,4 +157,12 @@ public class JoinMessage extends Message {
     public void setPartyName(String partyName) {
         this.partyName = partyName;
     }
+
+    /**
+     * See {@link joinType}.
+     */    
+    public void setJoinType(JoinType joinType) {
+        this.joinType = joinType;
+    }        
+    
 }

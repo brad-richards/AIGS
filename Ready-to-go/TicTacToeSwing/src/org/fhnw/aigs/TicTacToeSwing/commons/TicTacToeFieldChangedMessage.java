@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.FieldChangedMessage;
 /**
  * This message is used to inform clients about changes on the board.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "TicTacToeFieldChangedMessage")
 public class TicTacToeFieldChangedMessage extends FieldChangedMessage {
@@ -32,11 +33,17 @@ public class TicTacToeFieldChangedMessage extends FieldChangedMessage {
         this.playerSymbol = playerSymbol;
     }
 
+    /**
+     * see {@link TicTacToeFieldChangedMessage#playerSymbol}
+     */
     @XmlElement(name = "Symbol")
     public TicTacToeSymbol getPlayerSymbol() {
         return playerSymbol;
     }
 
+    /**
+     * see {@link TicTacToeFieldChangedMessage#playerSymbol}
+     */    
     public void setPlayerSymbol(TicTacToeSymbol playerSymbol) {
         this.playerSymbol = playerSymbol;
     }

@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * Klasse zur Mitteilung an den Server, welches Symbol (Schere, Stein, Papier, Nichts) beim Zug gewählt wurde.<br>
  * Aus Message abgeleitete Klasse.
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 @XmlRootElement(name = "RockPaperScissorsSelectionMessage")                     // Stellt sicher, dass Daten aus dieser Klasse korrekt in XML umgesetzt und versendet werden können (Kommunikation)
 public class RockPaperScissorsSelectionMessage extends Message {

@@ -15,9 +15,11 @@ import org.fhnw.aigs.commons.communication.GameEndsMessage;
 import org.fhnw.aigs.commons.communication.Message;
 
 /**
- * This class represents the game logic part of Minesweeper. 
- *
- * @author Matthias Stöckli
+ * This class represents the game logic part of Minesweeper.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Minor changes in Handling
+ * @author Matthias Stöckli (v1.1)
+ * @version v1.1
  */
 public class GameLogic extends Game {
 
@@ -45,7 +47,7 @@ public class GameLogic extends Game {
      * Don't forgett to set the same game name in the class {@link org.fhnw.aigs.Minesweeper.client.Main} in the package 'client'.
      */    
     public GameLogic() throws Exception {
-        super("Minesweeper", 1);
+        super("Minesweeper", "v1.1", 1);
         // setUpFields will be called after "SetmineCountMessage" arrived.
         // See processGameLogic.
     }

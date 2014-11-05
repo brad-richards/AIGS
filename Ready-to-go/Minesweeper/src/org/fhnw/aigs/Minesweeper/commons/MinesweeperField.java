@@ -7,6 +7,7 @@ package org.fhnw.aigs.Minesweeper.commons;
  * position and whether it has been uncovered yet.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class MinesweeperField {
 

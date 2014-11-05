@@ -1,13 +1,13 @@
 package org.fhnw.aigs.server.gameHandling;
 
 import org.fhnw.aigs.commons.communication.ForceCloseMessage;
-import org.fhnw.aigs.server.communication.ServerCommunication;
 
 /**
  * If the server shuts down, the {@link ServerShutdownCleanUp#run} method of
  * this class will send a {@link ForceCloseMessage} will be sent to all clients.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 public class ServerShutdownCleanUp implements Runnable {
 

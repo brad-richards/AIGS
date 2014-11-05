@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.fhnw.aigs.server.gameHandling;
 
 import java.awt.event.ActionEvent;
@@ -17,6 +11,7 @@ import javax.swing.JList;
  * The reloade function has only informative purpose. The actual reloading
  * of classes happens at runtime when connection to games.
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 public class ReloadClassesAction implements ActionListener{
     

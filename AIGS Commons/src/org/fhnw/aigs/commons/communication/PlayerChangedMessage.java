@@ -10,6 +10,7 @@ import org.fhnw.aigs.commons.Player;
  * method {@link org.fhnw.aigs.commons.Game#passTurnToNextPlayer} is being invoked.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "PlayerChangedMessage")
 public class PlayerChangedMessage extends Message {

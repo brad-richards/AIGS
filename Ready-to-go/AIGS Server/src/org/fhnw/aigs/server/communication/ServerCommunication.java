@@ -12,13 +12,18 @@ import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
  * server to the clients. Due to the fact that the class uses the Singleton
  * Pattern, it is not possible to instantiate ClientCommunication directly. In
  * order to get to an instance, use {@link ServerCommunication#getInstance}
- * instead.
+ * instead.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes
  * @version 1.1 (Raphael Stoeckli, 01.08.2014)
  * @author Matthias Stöckli (v1.0)
  */
 public class ServerCommunication implements Runnable {
     
     
+    /**
+     * The running state of the current instance
+     */
     private boolean runState;
 
     /**

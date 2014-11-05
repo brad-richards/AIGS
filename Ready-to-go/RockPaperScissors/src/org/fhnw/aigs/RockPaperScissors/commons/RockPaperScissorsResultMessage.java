@@ -9,6 +9,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * Das resultat ist immer aus der Sicht des jeweiligen Clients. Die selbe Nachricht darf also nicht an alle Clients gesendet, sondern muss pro Client definiert werden.
  * Aus Message abgeleitete Klasse.
  * @author Raphael Stoeckli
+ * @version v1.0
  */
 @XmlRootElement(name = "RockPaperScissorsResultMessage")                        // Stellt sicher, dass Daten aus dieser Klasse korrekt in XML umgesetzt und versendet werden können (Kommunikation)
 public class RockPaperScissorsResultMessage extends Message {

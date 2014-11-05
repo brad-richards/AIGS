@@ -18,8 +18,11 @@ import org.fhnw.aigs.swingClient.GUI.BackgroundPanel;
 /**
  * This is the graphical representation of the BinaerOperatorenSpiel.
  * It contains labels for the score the status and the current question,
- * an answer field and a send button.
- * @author Matthias Stöckli
+ * an answer field and a send button.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Minor changes
+ * @author Matthias Stöckli (v1.0)
+ * @version 1.0.1
  */
 public class BinaerOperatorenPanel extends BackgroundPanel {
     /**
@@ -171,6 +174,8 @@ public class BinaerOperatorenPanel extends BackgroundPanel {
             statusLabel.setForeground(Color.green);
             clientGame.changeScore(1);
         }
+        
+        answerField.setText(""); // Clear Field
         
         scoreLabel.setText(clientGame.getScore() + " / " + clientGame.getMaxScore());
         if(clientGame.getScore() < 0){

@@ -8,6 +8,7 @@ import org.fhnw.aigs.commons.communication.FieldChangedMessage;
 /**
  * This message is used to inform clients about changes on the board.
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "TicTacToeFieldChangedMessage")
 public class TicTacToeFieldChangedMessage extends FieldChangedMessage {

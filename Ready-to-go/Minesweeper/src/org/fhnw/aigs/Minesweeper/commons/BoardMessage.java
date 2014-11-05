@@ -9,6 +9,7 @@ import org.fhnw.aigs.commons.communication.Message;
  * This message is used to inform the client about fields that changed their status.
  *
  * @author Matthias Stöckli
+ * @version v1.0
  */
 @XmlRootElement(name = "BoardMessage")
 public class BoardMessage extends Message {

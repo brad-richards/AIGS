@@ -17,6 +17,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import org.fhnw.aigs.client.communication.Settings;
+import org.fhnw.aigs.client.gameHandling.ClientGame;
 
 /**
  * This class provides represents the "frame" around a game. It is structured in
@@ -30,9 +32,12 @@ import javafx.util.Duration;
  * <li>The {@link BaseGameWindow#footer} is the last part which only takes up
  * 5%. It can be accessed via {@link BaseGameWindow#getFooter} but does not have
  * any functionality in the base client.</li>
- * </ul>
+ * </ul><br>
+ * v1.0 Initial release<br>
+ * v1.1 Change of handling and UI improvements
  *
- * @author Matthias Stöckli
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 22.10.2014)
  */
 public class BaseGameWindow extends GridPane {
 
@@ -46,10 +51,12 @@ public class BaseGameWindow extends GridPane {
     private Stage primaryStage;
     /**
      * Allows to show an overlay like a loading window. Use
+     * {@link BaseGameWindow#removeOverlay()},  
      * {@link BaseGameWindow#setOverlay} and
      * {@link BaseGameWindow#fadeOutOverlay()} for that purpose.
      */
     private Node overlay;
+    
     /**
      * The header, contains the game title and a status label which can be
      * modified
@@ -67,6 +74,11 @@ public class BaseGameWindow extends GridPane {
      */
     private Pane footer;
 
+    /**
+     * The title of the Window
+     */
+    private String title;
+    
     /**
      * This is the recommended constructor. This allows to use a stylesheet
      * which can then be used in other classes such as Fields or Boards.
@@ -97,6 +109,7 @@ public class BaseGameWindow extends GridPane {
      */
     public BaseGameWindow(Stage primaryStage, String title) {
         this.primaryStage = primaryStage;
+        this.title = title;
 
         // Set the scree dimensions (4/3 of the screens width)
         // this makes sure that the Game Window always appears to be of the same
@@ -182,7 +195,6 @@ public class BaseGameWindow extends GridPane {
                 System.exit(0);
             }
         });
-
     }
 
     /**
@@ -262,9 +274,48 @@ public class BaseGameWindow extends GridPane {
     }
 
     /**
+     * Initializes the game.<br>
+     * This method will call the settings window if no settings are defined or
+     * if the window is configured to be visible at every startup.<br>
+     * Depending on the settings, the setup window or the loading window (overlay) 
+     * will be enabled. An auomatic connection will be established in case
+     * of the loading window. Call this method in the <b>start()</b> method of your game 
+     * (in Main.java or a similar calss containing the main method)
+     * @param content The main pane of the game. This could be an instance of {@link BaseBoard} or any instance derived from {@link Node} like {@link GridPane} 
+     * @param clientGame The client game object of the game
+     * @since v1.1
+     */
+    public void InitGame(Node content, ClientGame clientGame)
+    {
+        if (clientGame.getVersionString() != null)
+        {
+            this.primaryStage.setTitle(this.title + " " + clientGame.getVersionString());
+        }
+        else
+        {
+            this.primaryStage.setTitle(this.title);
+        }
+        this.setContent(content);
+        Settings.tryLoadSettings(true);                                         // Open Settings window, if defined
+        this.setOverlay(new SetupWindow(clientGame),true);
+        this.primaryStage.show();    
+   }
+    
+        /**
      * See {@link BaseGameWindow#overlay}.
      */
     public void setOverlay(Node overlay) {
+        setOverlay(overlay, false);
+    }
+    
+    /**
+     * See {@link BaseGameWindow#overlay}.
+     */
+    public void setOverlay(Node overlay, boolean overrideRemoveExistingOverlay) {
+        if (this.overlay != null && overrideRemoveExistingOverlay == false)
+        {
+            removeOverlay();                                                    // Remove an existing overlay first
+        }
         this.overlay = overlay;
         try {
             this.add(overlay, 1, 1);
@@ -273,10 +324,30 @@ public class BaseGameWindow extends GridPane {
         overlay.toFront();
         content = null;
     }
+    
+    /**
+     * Removes the top layer of the overlay. Use this method if joining or 
+     * creating a party is failed and the setup window has to be showed again.<br> 
+     * Do not use it to start the party. Use then {@link BaseGameWindow#fadeOutOverlay()} instead.
+     * See {@link BaseGameWindow#overlay}.
+     * @since v1.1
+     */
+    private void removeOverlay()
+    {
+        try
+        {
+            this.getChildren().remove(this.getChildren().size() - 1);
+        }
+        catch (Exception e)
+        {
+            
+        }
+    }
 
     /**
-     * This method allows to fade out an overlay set by
-     * {@link BaseGameWindow#setOverlay}.
+     * This method allows to fade out an overlay set by {@link BaseGameWindow#setOverlay}.<br>
+     * Use this method to start the party. If an overlay has to be replaced with 
+     * another one, use method {@link BaseGameWindow#removeOverlay()} instead.
      */
     public void fadeOutOverlay() {
         FadeTransition ft = new FadeTransition(Duration.seconds(1), overlay);

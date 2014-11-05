@@ -11,8 +11,11 @@ import org.fhnw.aigs.commons.communication.Message;
 
 /**
  * Klasse zur Abbildung der Clientseitigen Logik.<br>
- * Abgeleitet von ClientGame aus dem AIGS BaseClient
+ * Abgeleitet von ClientGame aus dem AIGS BaseClient<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Minor chamnges due to dependencies
  * @author Raphael Stoeckli
+ * @version v1.0.1
  */
 public class RockPaperScissorsClientGame extends ClientGame{
     
@@ -39,11 +42,12 @@ public class RockPaperScissorsClientGame extends ClientGame{
      * Konstruktor mit Argumenten
      * @param gameName Name des Spiels
      * @param mode GameModus (SinglePlayer, MultiPlayer)
+     * @param version Versiond es Programms
      */
-    public RockPaperScissorsClientGame(String gameName, GameMode mode)
+    public RockPaperScissorsClientGame(String gameName, String version, GameMode mode)
     {
         // WICHTIG - Aufruf der Super-Klasse
-        super(gameName, mode);                                                  // Rufe Konstruktor von Super-Klasse auf
+        super(gameName, version, mode);                                          // Rufe Konstruktor von Super-Klasse auf: Name, Version (optional), Game Mode
     }
 
     

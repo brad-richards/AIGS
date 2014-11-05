@@ -24,8 +24,11 @@ import org.fhnw.aigs.commons.communication.PlayerChangedMessage;
  * The class will be automatically loaded. The empty constructor of the
  * inherited class must call Game's constructor. Example:<br>
  * <code>super("TicTacToe", 2, 2);</code>
- *
- * @author Matthias Stöckli
+ *<br>
+ * v1.0 Initial release<br>
+ * v1.1 Private game property, version property and toString method added
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli, 21.10.2014)
  */
 public abstract class Game {
 
@@ -76,6 +79,16 @@ public abstract class Game {
      * Indicates whether the game is still running or not
      */
     protected boolean gameEnded;
+    
+    /**
+     * Indicates whether the game is private or public
+     */
+    protected boolean privateGame;
+    
+    /**
+     * Indicates a (optional) version number of the game. Use this for better version control of games on the server
+     */
+    protected String versionString;
 
     /**
      * Game is <b>abstract</b>, therefore it is not possible to create instances
@@ -91,6 +104,23 @@ public abstract class Game {
         this.id = currentHighestId;
         currentHighestId++;
     }
+    
+    /**
+     * Game is <b>abstract</b>, therefore it is not possible to create instances
+     * without inheriting from the class. Use this and only this constructor
+     * when defining a new class inheriting from Game.<br>
+     *
+     * @param gameName The name of the game.
+     * @param minNumberOfPlayers The minimum required number of players.
+     * @param version The version of the game
+     */
+    public Game(String gameName, String version, int minNumberOfPlayers) {
+        this.versionString = version;
+        this.minNumberOfPlayers = minNumberOfPlayers;
+        this.gameName = gameName;
+        this.id = currentHighestId;
+        currentHighestId++;
+    }    
 
     /**
      * This is the first method that will be called after the game has been set
@@ -285,6 +315,20 @@ public abstract class Game {
     public boolean isGameEnded() {
         return gameEnded;
     }
+    
+    /**
+     * See {@link Game#privateGame}.
+     */    
+    public boolean isPrivateGame() {
+        return privateGame;
+    }
+    
+    /**
+     * See {@link Game#versionString}.
+     */        
+    public String getVersionString() {
+        return versionString;
+    }   
 
     /**
      * This method sets the current player manually. Additionally a
@@ -319,6 +363,20 @@ public abstract class Game {
     public void setGameEnded(boolean gameEnded) {
         this.gameEnded = gameEnded;
     }
+    
+    /**
+     * See {@link Game#privateGame}.
+     */        
+    public void setPrivateGame(boolean isPrivateGame) {
+        this.privateGame = isPrivateGame;
+    } 
+   
+    /**
+    * See {@link Game#versionString}.
+    */ 
+    public void setVersionString(String versionString) {
+        this.versionString = versionString;
+    }     
 
     /**
      * Gets a player by his or her ID.
@@ -374,7 +432,7 @@ public abstract class Game {
      * @return Random player.
      */
     public Player getRandomPlayer() {
-        int randomPlayer = (int) Math.floor(Math.random() * minNumberOfPlayers);      // <-- nicht gut...
+        int randomPlayer = (int) Math.floor(Math.random() * minNumberOfPlayers);      // Is this OK? Maybe review
         return players.get(randomPlayer);
     }
 
@@ -404,10 +462,35 @@ public abstract class Game {
     /**
      * Shows the game's name and the ID.
      *
-     * @return The game's name and it's ID.
+     * @return The game's name, it's ID, version string and the party name if defined.
      */
     @Override
     public String toString() {
-        return gameName + ", ID = " + id;
+        StringBuilder sb = new StringBuilder(); 
+        if (this.partyName != null && !this.partyName.isEmpty())
+        {
+           sb.append("Name = ");
+           sb.append(this.partyName);
+           sb.append(", ");
+        }
+        sb.append("Type = ");
+        sb.append(this.gameName);
+        if (this.versionString != null && !this.versionString.isEmpty())
+        {
+        sb.append(" [");
+        sb.append(this.versionString);
+        sb.append("]");
+        }
+        sb.append(", ID = ");
+        sb.append(this.id);
+        if (this.isPrivateGame() == true)
+        {
+            sb.append(" [private party]");
+        }
+        else
+        {
+            sb.append(" [public party]");
+        }
+        return sb.toString();
     }
 }

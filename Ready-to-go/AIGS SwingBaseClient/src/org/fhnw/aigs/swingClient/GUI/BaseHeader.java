@@ -5,10 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -17,19 +15,20 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 /**
  * Provides a simple header for the GameWindow.
  * It shows the title of the game and a status which can be defined with
- * the method {@link BaseHeader#setStatusLabelText(java.lang.String)}.
- * @author Matthias Stöckli
+ * the method {@link BaseHeader#setStatusLabelText(java.lang.String)}.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Minor changes (tooltips)
+ * @version 1.0.1
+ * @author Matthias Stöckli (v1.0)
  */
 public class BaseHeader extends BackgroundPanel{
     private final JLabel gameNameLabel;
     private final JLabel statusLabel;
     private final JButton settingsButton;
- //   private final Image headerImage;
     
     /**
      * Create a new instance of BaseHeader.
@@ -69,6 +68,7 @@ public class BaseHeader extends BackgroundPanel{
         java.net.URL imageUrl = this.getClass().getResource("/Assets/BasePatterns/settings.png");
         Icon ico = new ImageIcon(imageUrl);
         settingsButton.setIcon(ico);
+        settingsButton.setToolTipText("Opens the settings window");
         
         settingsButton.addActionListener(new ActionListener() {
             @Override

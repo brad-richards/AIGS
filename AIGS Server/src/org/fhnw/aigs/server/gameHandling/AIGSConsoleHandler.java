@@ -12,7 +12,10 @@ import org.fhnw.aigs.server.communication.ServerCommunication;
 
 /**
  * This class is responsible for console input when the server is run in
- * console mode.
+ * console mode.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes<br>
+ * v1.2 Functional changes
  * @author Matthias Stöckli (v1.0)
  * @version 1.2 (Raphael Stoeckli, 07.10.2014)
  */

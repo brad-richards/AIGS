@@ -25,10 +25,11 @@ import org.fhnw.aigs.server.gui.ServerGUI;
  * This class is responsible for all User related tasks. It loads generates user
  * files, loads users, logs them on and off.<br>
  * v1.0 Initial release<br>
- * v1.1 Major changes in handling
+ * v1.1 Major changes in handling<br>
+ * v1.1.1 Bugfixes
  *
  * @author Matthias Stöckli
- * @version 1.1 (Raphael Stoeckli, 14.10.2014)
+ * @version 1.1.1 (Raphael Stoeckli, 06.11.2014)
  */
 @XmlRootElement(name = "User")
 public class User {
@@ -571,12 +572,11 @@ public class User {
             // Parse the user configuration file's content directly using JAXB
             users = (User.UserList) JAXB.unmarshal(userConfigFile, User.UserList.class);
             Logger.getLogger(User.class.getName()).log(Level.INFO, "Read user configuration.");
-            return users;
         } else {
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be read.");
+            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be read. Creating an empty user list.");
+            users = new UserList();
         }
-
-        return null;
+        return users;
     }
     
     /**
@@ -666,16 +666,23 @@ public class User {
      * This construct is storing users - it was created for XML-parsing purposes
      * and is just a wrapper for an ArrayList which is not natively supported by
      * JAXB without modifications.
+     * @author Matthias Stöckli
+     * @version v1.0
      */
     @XmlRootElement(name = "Users")
     @XmlSeeAlso({User.class})
     public static class UserList extends ArrayList<User> {
-
-        public UserList() {
+        
+        /**
+         * Standard constructor
+         */
+        public UserList()
+        {
         }
 
         @XmlElement(name = "User")
-        public List<User> getUsers() {
+        public List<User> getUsers()
+        {
             return this;
         }
     }

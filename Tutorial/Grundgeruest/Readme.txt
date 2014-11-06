@@ -2,7 +2,7 @@
 ------------
 
 In der Zip-Datei befindet sich das NetBeans/Eclipse-Projekt für das Grundgerüst.
-Die Dateien müssen entpackt und mit dem ebenfalls entpackten Verzeichnis "RockPaperScissors" im Projektverzeichnis abgelegt werden. Bei NetBeans kann dies Verzeichnis an einem beliebigen Ort sein. Bei Eclipse befindet es sich im Workspace.
+Die Dateien müssen entpackt und mit dem ebenfalls entpackten Verzeichnis "RockPaperScissors" im Projektverzeichnis abgelegt werden. Bei NetBeans kann dieses Verzeichnis an einem beliebigen Ort sein. Bei Eclipse befindet es sich im Workspace.
 
 ---------------
 

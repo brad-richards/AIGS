@@ -3,10 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gui/ServerGUI.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/User.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/Main.java</file>
-            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gui/UserSettingsWindow.java</file>
+            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/ServerConfiguration.java</file>
+            <file>file:/E:/FHNW/AIGS/git2/AIGS/Ready-to-go/AIGS%20Server/src/org/fhnw/aigs/server/gameHandling/GameManager.java</file>
         </group>
     </open-files>
 </project-private>

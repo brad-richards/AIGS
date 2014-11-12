@@ -1,0 +1,31 @@
+AIGS - Ready-to-go
+==================
+
+Developer notes
+---------------
+
+Content:
+Ready-to-go contains precompiled JAR files of all available AIGS projects. Also contained are NetBeans and Eclipse project definition for a quick start in these IDEs.
+
+Architecture:
+All projects are compiled with a 64 bit version of JDK 8 (Java 8).
+Nevertheless, the JAR files should be runnable on 32 and 64 bit systems with JRE/JDK 8.
+
+Preparations for a commit (git):
+1. Clean up and build (JAR output) AIGS Commons --> NetBeans recommended
+2. Copy built JARs from step 1 into the lib folders of all game projects, the AIGS Server project, the AIGS BaseClient and AIGS SwingBaseClient projects
+3. Clean up and build (JAR output) AIGS BaseClint and AIGS SwingBaseClient --> NetBeans recommended
+4. Copy built JARs from step 1 into the lib folders of all game projects
+4.1 Copy AIGS BaseClient into JavaFX based game projects
+4.2 Copy AIGS SwingBaseClient into Swing based game projects
+4.3 Copy AIGS BaseClient and AIGS SwingBaseClient (both) into lib folder of AIGS Server
+5. Clean up and build all game projects and the AIGS Server
+6. Delete all build folders, log folders and ClientConfig.xml files in all projects
+7. Copy the built JAR files from step 5 of all game projects into the folder gamelibs in AIGS Server
+8. Create a new Folder gamelibs in the dist folder of AIGS Server and copy the built JAR files from step 5 of all game projects into this folder 
+9. Make sure a bin folder exists in the AIGS Commons project. Put a readme.txt (or similar) file into it to avoid deletion of the empty folder in git
+(10.) If you developed in ready-to-go, copy all source folders and lib folders of the projects into the project folders (without IDE projet definition) within the main folder of the repository 
+
+Javadoc:
+If Javadoc must be updated, build Javadoc for each project and copy the built files into the sub folders of the Javadoc main folder.
+If a new game project was added to the repository, the index.html file in the main folder of Javadoc must be edited. Add a new sub folder with the new Javadoc content to the Javadoc main folder and add a reference to the index.html file according the existing entries.

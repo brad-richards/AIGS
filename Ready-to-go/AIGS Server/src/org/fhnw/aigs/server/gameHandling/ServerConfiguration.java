@@ -15,8 +15,9 @@ import javax.xml.bind.annotation.XmlTransient;
  * v1.0 Initial release<br>
  * v1.1 Functional changes<br>
  * v1.2 Features added and default values changed
+ * v1.2.1 Minor Changes in presets
  * @author Matthias Stöckli (v1.0)
- * @version 1.2 (Raphael Stoeckli, 14.10.2014)
+ * @version 1.2.1 (Raphael Stoeckli, 12.11.2014)
  */
 @XmlRootElement(name="Configuration")
 public class ServerConfiguration {
@@ -339,7 +340,7 @@ public class ServerConfiguration {
         boolean newMultiLoginAllowed = false;
         boolean newXMLlogging = false;
         boolean newHidesOnClose = false;
-        boolean anonymousLoginAllowed = false;
+        boolean anonymousLoginAllowed = true;
         String newWhatIsMyIpUrl = "http://icanhazip.com/"; // Alter default value if php script migrated to fhnw doamin (or similar)
         String newLogDirectory = "./logs";
         String newGamelibsDirectory = "./gamelibs";

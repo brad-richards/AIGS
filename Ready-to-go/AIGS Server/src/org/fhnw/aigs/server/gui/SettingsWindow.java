@@ -1,6 +1,5 @@
 package org.fhnw.aigs.server.gui;
 
-
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +12,7 @@ import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -22,22 +22,24 @@ import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
 import javax.swing.SpinnerNumberModel;
-import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingStyle;
+import org.fhnw.aigs.server.common.LoggingThreshold;
+import org.fhnw.aigs.server.common.ServerConfiguration;
 
 
 /**
  * This class represents a window to manage the server settings. These settings 
- * will be stored in {@link ServerConfiguration#instance}
- * @author Raphael Stoeckli (15.10.2014)
- * @version 1.0
+ * will be stored in {@link ServerConfiguration#instance}<br>
+ * v1.0 Initial release<br>
+ * v1.1 Functional changes (added fields / removed fields)
+ * @author Raphael Stoeckli (24.02.2015)
+ * @version 1.1
  */
-public class SettingsWindow extends JDialog{
-    
-    
+public class SettingsWindow extends JDialog{ 
+        
     private JCheckBox anonmousLoginCheckbox;
-    private JCheckBox compactLoggingCheckbox;
     private JCheckBox consoleModeCheckbox;
-    private JCheckBox xmlLoggingCheckbox;
     private JCheckBox multipleLoginCheckbox;
     private JCheckBox keepAliveManagerCheckbox;
     private JCheckBox hideOnCloseCheckbox;
@@ -47,8 +49,12 @@ public class SettingsWindow extends JDialog{
     private JTextPane whatIsMyIpField;
     private JSpinner keepAliveTimeoutSpinner;
     private JSpinner portNumberSpinner;
+    private JSpinner linesToLogSpinner;
+    private JComboBox loggingThresholdComboBox;
+    private JComboBox loggingStyleComboBox;
     private JButton saveButton;
     private JButton cancelButton;
+   
     
     /**
      * Standrd constructor without parameters
@@ -78,10 +84,6 @@ public class SettingsWindow extends JDialog{
         anonmousLoginCheckbox.setToolTipText("<html>If checked, the user management is not used. In this case, login is possible with every user name and without an identification code.<br>AdHoc users will be created instead. These users will be automatically removed after disconnecting from the server.</html>");
         multipleLoginCheckbox = new JCheckBox("Allow multiple logins of one user");
         multipleLoginCheckbox.setToolTipText("If checked, a user can login multiple times, otherwise all further login attempts will be refused by the server");
-        compactLoggingCheckbox = new JCheckBox("Use compact logging style");
-        compactLoggingCheckbox.setToolTipText("If checked, the logging output will presented in a compressed form");
-        xmlLoggingCheckbox = new JCheckBox("Use XML output as logging format");
-        xmlLoggingCheckbox.setToolTipText("If checked, the logging output will be formatted as XML an not as plain text");
         hideOnCloseCheckbox = new JCheckBox("Hide on window close (no termination)");
         hideOnCloseCheckbox.setToolTipText("If checked, the server programm will be minimized to the systray when clicking on the X-Button and not terminated");
         consoleModeCheckbox = new JCheckBox("Console-Modus (require program restart)");
@@ -103,6 +105,14 @@ public class SettingsWindow extends JDialog{
         portNumberSpinner.setToolTipText("TCP Port to communicate with the AIGS server");
         portNumberSpinner.setModel(new SpinnerNumberModel(1, 1, 65535, 1));
         portNumberSpinner.setEditor(new JSpinner.NumberEditor(portNumberSpinner, "#"));
+        linesToLogSpinner = new JSpinner();
+        linesToLogSpinner.setToolTipText("Number of lines to show in the logging window");
+        linesToLogSpinner.setModel(new SpinnerNumberModel(1, 1, 10000, 1));
+        linesToLogSpinner.setEditor(new JSpinner.NumberEditor(linesToLogSpinner, "#"));
+        loggingThresholdComboBox = new JComboBox(LoggingThreshold.values());
+        loggingThresholdComboBox.setToolTipText("Level (threshold) of logging");
+        loggingStyleComboBox = new JComboBox(LoggingStyle.values());
+        loggingStyleComboBox.setToolTipText("Style (also level of detail) of logging");        
         
         cancelButton = new JButton("Cancel");
         cancelButton.setToolTipText("Discard all changes and close");
@@ -119,7 +129,9 @@ public class SettingsWindow extends JDialog{
                 saveButtonActionPerformed(evt);
             }
         });
-        
+        JLabel linesToLogLabel = new JLabel("No. of lines in log window:");
+        JLabel loggingThresholdLabel = new JLabel("Logging threshold:");
+        JLabel loggingStyleLabel = new JLabel("Logging style:");
         JLabel logsDirectoryLabel = new JLabel("Logs directory:");
         JLabel gameDirLabel = new JLabel("Game directory (projects):");
         JLabel gameLibsLabel = new JLabel("Game library directory:");
@@ -142,15 +154,17 @@ public class SettingsWindow extends JDialog{
         GroupLayout loginTitlePanelLayout = new GroupLayout(loginTitlePanel);
         loginTitlePanel.setBorder(BorderFactory.createTitledBorder("Login / User"));
         loginTitlePanel.setLayout(loginTitlePanelLayout);
-        loginTitlePanelLayout.setHorizontalGroup(loginTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(loginTitlePanelLayout.createSequentialGroup()
+        loginTitlePanelLayout.setHorizontalGroup(
+            loginTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(loginTitlePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(loginTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(anonmousLoginCheckbox)
-                .addComponent(multipleLoginCheckbox))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );    
-        loginTitlePanelLayout.setVerticalGroup(loginTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(anonmousLoginCheckbox)
+                    .addComponent(multipleLoginCheckbox))
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+        loginTitlePanelLayout.setVerticalGroup(
+            loginTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(loginTitlePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(anonmousLoginCheckbox)
@@ -163,167 +177,189 @@ public class SettingsWindow extends JDialog{
         GroupLayout loggingTitlePanelLayout = new GroupLayout(loggingTitlePanel);
         loggingTitlePanel.setLayout(loggingTitlePanelLayout);        
         loggingTitlePanel.setBorder(BorderFactory.createTitledBorder("Logging"));
-        loggingTitlePanelLayout.setHorizontalGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                loggingTitlePanelLayout.setHorizontalGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(loggingTitlePanelLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(loggingTitlePanelLayout.createSequentialGroup()
-            .addComponent(logsDirectoryLabel)
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-            .addComponent(loggingScrollPane, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
-            )
-            .addGroup(loggingTitlePanelLayout.createSequentialGroup()
-            .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(compactLoggingCheckbox, GroupLayout.PREFERRED_SIZE, 187, GroupLayout.PREFERRED_SIZE)
-            .addComponent(xmlLoggingCheckbox))
-            .addGap(0, 0, Short.MAX_VALUE)))
-            .addContainerGap())
+                .addContainerGap()
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(logsDirectoryLabel)
+                    .addComponent(linesToLogLabel)
+                    .addComponent(loggingStyleLabel)
+                    .addComponent(loggingThresholdLabel))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addComponent(loggingThresholdComboBox, 0, 182, Short.MAX_VALUE)
+                    .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                        .addComponent(loggingStyleComboBox, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(linesToLogSpinner, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(loggingScrollPane, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         loggingTitlePanelLayout.setVerticalGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(loggingTitlePanelLayout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(compactLoggingCheckbox)
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(xmlLoggingCheckbox)
-            .addGap(10, 10, 10)
-            .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-            .addComponent(loggingScrollPane, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-            .addComponent(logsDirectoryLabel))
-            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );        
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(linesToLogLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(linesToLogSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(loggingTitlePanelLayout.createSequentialGroup()
+                        .addComponent(loggingStyleLabel)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 6, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(loggingStyleComboBox, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(loggingThresholdLabel)
+                    .addComponent(loggingThresholdComboBox, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(loggingTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(logsDirectoryLabel)
+                    .addComponent(loggingScrollPane, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)))
+        );       
         
         JPanel systemTitlePanel = new JPanel();
         GroupLayout systemTitleLayout = new GroupLayout(systemTitlePanel);
         systemTitlePanel.setLayout(systemTitleLayout);        
         systemTitlePanel.setBorder(BorderFactory.createTitledBorder("System"));
-        systemTitleLayout.setHorizontalGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        systemTitleLayout.setHorizontalGroup(
+            systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(systemTitleLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(warningLabel, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-            .addGroup(systemTitleLayout.createSequentialGroup()
-            .addGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(hideOnCloseCheckbox)
-            .addComponent(consoleModeCheckbox))
-            .addGap(0, 0, Short.MAX_VALUE)))
-            .addContainerGap())
+                .addContainerGap()
+                .addGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(warningLabel, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                    .addGroup(systemTitleLayout.createSequentialGroup()
+                        .addGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(hideOnCloseCheckbox)
+                            .addComponent(consoleModeCheckbox))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        systemTitleLayout.setVerticalGroup(systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        systemTitleLayout.setVerticalGroup(
+            systemTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(systemTitleLayout.createSequentialGroup()
-            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(hideOnCloseCheckbox)
-            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(consoleModeCheckbox)
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(warningLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        );        
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(hideOnCloseCheckbox)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(consoleModeCheckbox)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(warningLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );    
         
         JPanel gameTitlePanel = new JPanel();
         GroupLayout gameTitleLayout = new GroupLayout(gameTitlePanel);
         gameTitlePanel.setLayout(gameTitleLayout);
         gameTitlePanel.setBorder(BorderFactory.createTitledBorder("Game"));
-        gameTitleLayout.setHorizontalGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        gameTitleLayout.setHorizontalGroup(
+            gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(gameTitleLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(gameDirLabel)
-            .addComponent(gameLibsLabel))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(gameScrollPane1)
-            .addComponent(gameScrollPane2))
-            .addContainerGap())
+                .addContainerGap()
+                .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(gameDirLabel)
+                    .addComponent(gameLibsLabel))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(gameScrollPane2)
+                    .addComponent(gameScrollPane1))
+                .addContainerGap())
         );
-        gameTitleLayout.setVerticalGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        gameTitleLayout.setVerticalGroup(
+            gameTitleLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(gameTitleLayout.createSequentialGroup()
-            .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-            .addComponent(gameScrollPane2, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-            .addComponent(gameDirLabel))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-            .addComponent(gameScrollPane1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-            .addComponent(gameLibsLabel)))
-        );        
+                .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(gameScrollPane1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(gameDirLabel))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(gameTitleLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(gameScrollPane2, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(gameLibsLabel)))
+        );       
         
         JPanel connectivityTitlePanel = new JPanel();
         GroupLayout connectivityTitlePanelLayout = new GroupLayout(connectivityTitlePanel);
         connectivityTitlePanel.setLayout(connectivityTitlePanelLayout);        
         connectivityTitlePanel.setBorder(BorderFactory.createTitledBorder("Connectivity"));
-        connectivityTitlePanelLayout.setHorizontalGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        connectivityTitlePanelLayout.setHorizontalGroup(
+            connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(keepAliveManagerCheckbox)
-            .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(keepAliveLabel)
-            .addComponent(portNumberLabel)
-            .addComponent(whatIsMyIpLabel))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(connectivityScrollPane)
-            .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(portNumberSpinner, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-            .addComponent(keepAliveTimeoutSpinner, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE))
-            .addGap(0, 0, Short.MAX_VALUE)))))
-            .addContainerGap())
+                .addContainerGap()
+                .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(keepAliveManagerCheckbox)
+                    .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
+                        .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(keepAliveLabel)
+                            .addComponent(portNumberLabel)
+                            .addComponent(whatIsMyIpLabel))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(connectivityScrollPane)
+                            .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
+                                .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(portNumberSpinner, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(keepAliveTimeoutSpinner, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
         );
-        connectivityTitlePanelLayout.setVerticalGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        connectivityTitlePanelLayout.setVerticalGroup(
+            connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(connectivityTitlePanelLayout.createSequentialGroup()
-            .addComponent(keepAliveManagerCheckbox)
-            .addGap(3, 3, 3)
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-            .addComponent(keepAliveLabel)
-            .addComponent(keepAliveTimeoutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-            .addComponent(portNumberLabel)
-            .addComponent(portNumberSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-            .addComponent(connectivityScrollPane, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-            .addComponent(whatIsMyIpLabel)))
+                .addComponent(keepAliveManagerCheckbox)
+                .addGap(3, 3, 3)
+                .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(keepAliveLabel)
+                    .addComponent(keepAliveTimeoutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(portNumberLabel)
+                    .addComponent(portNumberSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(connectivityTitlePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(connectivityScrollPane, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(whatIsMyIpLabel)))
         );        
         
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+               layout.setHorizontalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-            .addComponent(loginTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(loggingTitlePanel, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(gameTitlePanel, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addComponent(saveButton)
-            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(cancelButton))
-            .addComponent(connectivityTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(systemTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addContainerGap())
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(loginTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(loggingTitlePanel, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(gameTitlePanel, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                            .addComponent(connectivityTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(systemTitlePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(saveButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton)
+                        .addGap(31, 31, 31))))
         );
-        layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        layout.setVerticalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                .addComponent(loginTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(loggingTitlePanel, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(gameTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createSequentialGroup()
-                .addComponent(systemTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(connectivityTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(cancelButton)
-                .addComponent(saveButton))))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(loginTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(loggingTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(gameTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(systemTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(connectivityTitlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(saveButton)
+                            .addComponent(cancelButton))))
+                .addContainerGap())
         );
         
        this.addWindowListener(new CloseListener());
@@ -358,8 +394,6 @@ public class SettingsWindow extends JDialog{
       
       this.anonmousLoginCheckbox.setSelected(conf.getIsAnonymousLoginAllowed());
       this.multipleLoginCheckbox.setSelected(conf.getIsMultiLoginAllowed());
-      this.compactLoggingCheckbox.setSelected(conf.getIsCompactLoggingEnabled());
-      this.xmlLoggingCheckbox.setSelected(conf.getIsXMLlogging());
       this.hideOnCloseCheckbox.setSelected(conf.getHidesOnClose());
       this.consoleModeCheckbox.setSelected(conf.getIsConsoleMode());
       this.keepAliveManagerCheckbox.setSelected(conf.getUseKeepAliveManager());
@@ -371,6 +405,10 @@ public class SettingsWindow extends JDialog{
       this.keepAliveTimeoutSpinner.setValue(conf.getKeepAliveTimeOut());
       this.portNumberSpinner.setValue(conf.getPortNumber());
     
+      this.linesToLogSpinner.setValue(conf.getLinesToLog());
+      this.loggingStyleComboBox.setSelectedItem(conf.getLoggerStyle());
+      this.loggingThresholdComboBox.setSelectedItem(conf.getLoggerThreshold());
+      
     }
     
     /**
@@ -463,8 +501,6 @@ public class SettingsWindow extends JDialog{
 
       ServerConfiguration.getInstance().setIsAnonymousLoginAllowed(this.anonmousLoginCheckbox.isSelected());
       ServerConfiguration.getInstance().setIsMultiLoginAllowed(this.multipleLoginCheckbox.isSelected());
-      ServerConfiguration.getInstance().setIsCompactLoggingEnabled(this.compactLoggingCheckbox.isSelected());
-      ServerConfiguration.getInstance().setIsXMLlogging(this.xmlLoggingCheckbox.isSelected());
       ServerConfiguration.getInstance().setHidesOnClose(this.hideOnCloseCheckbox.isSelected());
       ServerConfiguration.getInstance().setIsConsoleMode(this.consoleModeCheckbox.isSelected());
       ServerConfiguration.getInstance().setUseKeepAliveManager(this.keepAliveManagerCheckbox.isSelected());
@@ -476,13 +512,23 @@ public class SettingsWindow extends JDialog{
       
       ServerConfiguration.getInstance().setKeepAliveTimeOut((int)this.keepAliveTimeoutSpinner.getValue());
       ServerConfiguration.getInstance().setPortNumber((int)this.portNumberSpinner.getValue());
+      
+      ServerConfiguration.getInstance().setLinesToLog((int)this.linesToLogSpinner.getValue());
+      ServerConfiguration.getInstance().setLoggerStyle((LoggingStyle)this.loggingStyleComboBox.getSelectedItem());
+      ServerConfiguration.getInstance().setLoggerThreshold((LoggingThreshold)this.loggingThresholdComboBox.getSelectedItem());
               
       ServerConfiguration.saveInstance();
       if (this.logsDirectoryField.getText().equals(backupLoggerDirectory) == false && ServerConfiguration.getInstance().getTempLogsDirectory().equals(""))
       {
           JOptionPane.showMessageDialog(this, "<html>The new logs directory will be used after a program restart:<br>" + this.logsDirectoryField.getText() + "</html>", "New logs directory", JOptionPane.INFORMATION_MESSAGE);
           ServerConfiguration.getInstance().setTempLogsDirectory(backupLoggerDirectory); // Write current location back for runtime purpose. Will be changed after restart 
-      }      
+      }
+      
+      LogRouter.updateRules(); // Update Logging-Rules
+      if (ServerGUI.getInstance() != null) // GUI handling
+      {
+          ServerGUI.getInstance().getLogListener().setLimitLines(ServerConfiguration.getInstance().getLinesToLog()); // Update Lines to Log
+      }
       
     }
     

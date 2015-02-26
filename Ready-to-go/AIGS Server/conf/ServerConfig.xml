@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Configuration xmlns:aigs="https://ol19ns11008.fhnw.ch/">
+<Configuration>
     <GameSourcesDirectory>./games</GameSourcesDirectory>
     <GamelibsDirectory>./gamelibs</GamelibsDirectory>
     <HidesOnClose>false</HidesOnClose>
     <IsAnonymousLoginAllowed>true</IsAnonymousLoginAllowed>
-    <IsCompactLoggingEnabled>false</IsCompactLoggingEnabled>
     <IsConsoleMode>false</IsConsoleMode>
     <IsMultiLoginAllowed>false</IsMultiLoginAllowed>
-    <IsXMLlogging>false</IsXMLlogging>
     <KeepAliveTimeOut>10000</KeepAliveTimeOut>
+    <LinesToLog>500</LinesToLog>
     <LogDirectory>./logs</LogDirectory>
+    <LoggerStyle>compressed</LoggerStyle>
+    <LoggerThreshold>severeSystemGame</LoggerThreshold>
     <PortNumber>25123</PortNumber>
     <UseKeepAliveManager>false</UseKeepAliveManager>
     <WhatIsMyIpUrl>http://icanhazip.com/</WhatIsMyIpUrl>

@@ -3,9 +3,9 @@ package org.fhnw.aigs.commons.communication;
 import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.*;
 import javax.xml.bind.annotation.*;
+import org.fhnw.aigs.commons.LogRouter;
 import org.fhnw.aigs.commons.Player;
 import org.fhnw.aigs.commons.XMLHelper;
 
@@ -44,9 +44,10 @@ import org.fhnw.aigs.commons.XMLHelper;
  * {@literal @}XmlElement's name attribute is the child's name in the marshalled XML
  * form.</li></ul><br>
  * v1.0 Initial release<br>
- * v1.1 Functional changes
+ * v1.1 Functional changes<br>
+ * v1.2 Changing of logging
  * @author Matthias Stöckli (v1.0)
- * @version 1.1 (Raphael Stoeckli, 12.08.2014)
+ * @version 1.2 (Raphael Stoeckli, 26.02.2015)
  */
 public abstract class Message {
 
@@ -121,7 +122,8 @@ public abstract class Message {
                 String xmlString = sw.toString();
                 writer.println(xmlString);
                 writer.flush();
-                Logger.getLogger(Message.class.getName()).log(Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString));
+                //Logger.getLogger(Message.class.getName()).log(Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString));
+                LogRouter.log(Message.class.getName(), Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString));
                 processingError = false;
                 break;
 
@@ -147,7 +149,8 @@ public abstract class Message {
        }
        if (processingError == true) // none of the n attemps was successful
        {
-           Logger.getLogger(Message.class.getName()).log(Level.SEVERE, errorMessage, ex1);
+           //Logger.getLogger(Message.class.getName()).log(Level.SEVERE, errorMessage, ex1);
+           LogRouter.log(Message.class.getName(), Level.SEVERE, errorMessage, ex1);
        }
     }      
 

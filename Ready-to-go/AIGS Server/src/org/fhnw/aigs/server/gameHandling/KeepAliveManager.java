@@ -1,13 +1,14 @@
 package org.fhnw.aigs.server.gameHandling;
 
+import org.fhnw.aigs.server.common.ServerConfiguration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.fhnw.aigs.commons.Game;
 import org.fhnw.aigs.commons.Player;
 import org.fhnw.aigs.commons.communication.KeepAliveMessage;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 
 /**
  * This class helps detecting idle clients.<br>
@@ -23,10 +24,12 @@ import org.fhnw.aigs.commons.communication.KeepAliveMessage;
  * will then interpret this as a time out. An interval of one or two minutes
  * (60000 to 120000 ms) is sufficient to detect blocked clients. Is is possible
  * to turn of the KeepAliveManager by setting "UseKeepAliveManager" in the
- * Server Configuration to "false".
+ * Server Configuration to "false".<br>
+ * v1.0 Initial release<br>
+ * v1.1 Changing of logging
  *
- * @author Matthias Stöckli
- * @version v1.0
+ * @author Matthias Stöckli (v1.0)
+ * @version v1.1 (Raphael Stoeckli 24.02.2015)
  */
 public class KeepAliveManager implements Runnable {
 
@@ -92,7 +95,8 @@ public class KeepAliveManager implements Runnable {
                     keepAliveMessage.setSentTime(new Date());
                     game.sendMessageToPlayer(keepAliveMessage, player);
                     duePlayers.put(player.getName(), player);
-                    Logger.getLogger(KeepAliveManager.class.getName()).log(Level.FINE, "Sent KeepAlive to {0}", player.getName());
+                    //LOG//Logger.getLogger(KeepAliveManager.class.getName()).log(Level.FINE, "Sent KeepAlive to {0}", player.getName());
+                    LogRouter.log(KeepAliveManager.class.getName(), LoggingLevel.info, "Sent KeepAlive to {0}", player.getName());
                 }
             }
 
@@ -101,7 +105,8 @@ public class KeepAliveManager implements Runnable {
             try {
                 Thread.sleep(keepAliveTimeOut);
             } catch (InterruptedException ex) {
-                Logger.getLogger(KeepAliveManager.class.getName()).log(Level.SEVERE, null, ex);
+                //LOG//Logger.getLogger(KeepAliveManager.class.getName()).log(Level.SEVERE, null, ex);
+                LogRouter.log(KeepAliveManager.class.getName(), LoggingLevel.severe, null, ex);
             }
 
             // Iterate through all games again and check whether an inactive player

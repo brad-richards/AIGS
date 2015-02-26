@@ -1,14 +1,14 @@
 package org.fhnw.aigs.server.gameHandling;
 
+import org.fhnw.aigs.server.common.ServerConfiguration;
 import org.fhnw.aigs.commons.GameMode;
 import java.lang.reflect.*;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.fhnw.aigs.commons.*;
 import org.fhnw.aigs.commons.communication.*;
-import org.fhnw.aigs.server.communication.ServerMessageBroker;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 import org.fhnw.aigs.server.gui.ServerGUI;
 
 /**
@@ -17,10 +17,11 @@ import org.fhnw.aigs.server.gui.ServerGUI;
  * the GameManager does not do much for the game, expect terminating it.<br>
  * v1.0 Initial release<br>
  * v1.1 Features added<br>
- * v1.2 Major changes in handlung and additional features
+ * v1.2 Major changes in handlung and additional features<br>
+ * v1.3 Changing of logging
  *
  * @author Matthias Stöckli
- * @version v1.2 (Raphael Stoeckli, 27.10.2014)
+ * @version v1.3 (Raphael Stoeckli, 24.02.2015)
  */
 public class GameManager {
 
@@ -63,7 +64,8 @@ public class GameManager {
             Game existing = checkIfPartyAlreadyExists(gameName, partyName);
             if (existing != null) // Game already exists
             {
-                Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not create the party '{0}' of the type {1}, because this party already exists.", new Object[]{partyName, gameName});
+                //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not create the party '{0}' of the type {1}, because this party already exists.", new Object[]{partyName, gameName});
+                LogRouter.log(GameManager.class.getName(), LoggingLevel.waring, "Can not create the party '{0}' of the type {1}, because this party already exists.", new Object[]{partyName, gameName});
                 JoinResponseMessage response = new JoinResponseMessage(joinType, gameMode, false, false, "The party '" + partyName + "' could not be created, because this party name already exists");
                 response.send(player.getSocket(), player);    
                
@@ -83,7 +85,8 @@ public class GameManager {
                             joinedGame.setPrivateGame(false);
                         }
                         joinedGame.addPlayer(player);
-                        Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                        //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                        LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
                         gameCreated = true;
                     }
             }
@@ -97,12 +100,14 @@ public class GameManager {
                 JoinResponseMessage response = null;
                 if (isRunning == true)
                 {
-                    Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party has already started.", new Object[]{partyName, gameName});
+                    //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party has already started.", new Object[]{partyName, gameName});
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.waring, "Can not join the party '{0}' of the type {1}, because this party has already started.", new Object[]{partyName, gameName});
                     response = new JoinResponseMessage(joinType, gameMode,false, false, "The party '" + partyName + "' could not be joined, because it has already started");     
                 }
                 else
                 {
-                    Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party does not exist.", new Object[]{partyName, gameName});
+                    //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.WARNING, "Can not join the party '{0}' of the type {1}, because this party does not exist.", new Object[]{partyName, gameName});
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.waring, "Can not join the party '{0}' of the type {1}, because this party does not exist.", new Object[]{partyName, gameName});
                     response = new JoinResponseMessage(joinType, gameMode,false, false, "The party '" + partyName + "' could not be joined, because this party name does not exist");                
                 }
                 response.send(player.getSocket(), player);             
@@ -113,7 +118,8 @@ public class GameManager {
                 joinedGame = joinParty(gameName, gameMode, player, partyName, false);
                 if (joinedGame != null)
                 {
-                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined the existing {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                    //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined the existing {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "{0} joined the existing {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
                 }
                 else
                 {
@@ -141,7 +147,8 @@ public class GameManager {
                     {
                         joinedGame.setPrivateGame(false);                       // Create a public game
                     }
-                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                    //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "{0} created and joined a new {1} party with the name '{2}'!", new Object[]{player.toString(), gameName, partyName});
                     gameCreated = true;
                 }
                 else
@@ -155,7 +162,8 @@ public class GameManager {
                 joinedGame = joinRandomGame(gameName, gameMode, player);
                 if (joinedGame != null)
                 {
-                    Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined a random party in multiplayer {1}", new Object[]{player.getName(), gameName});                    
+                    //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "{0} joined a random party in multiplayer {1}", new Object[]{player.getName(), gameName});
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "{0} joined a random party in multiplayer {1}", new Object[]{player.getName(), gameName});
                 }
                 else
                 {
@@ -186,11 +194,13 @@ public class GameManager {
             try {
                 joinedGame.initialize();
             } catch (Exception ex) {
-                Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "Could not initialize game.", ex);
+                //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "Could not initialize game.", ex);
+                LogRouter.log(GameManager.class.getName(), LoggingLevel.severe, "Could not initialize game.", ex);
                 ExceptionMessage exceptionMessage = new ExceptionMessage(ex);
                 exceptionMessage.send(player.getSocket(), player);
             }
-            Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "Initialized {0} (ID {1})", new Object[]{gameName, joinedGame.getId()});
+            //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.INFO, "Initialized {0} (ID {1})", new Object[]{gameName, joinedGame.getId()});
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.info, "Initialized {0} (ID {1})", new Object[]{gameName, joinedGame.getId()});
         }
         JoinResponseMessage response = new JoinResponseMessage(joinType, true, gameCreated);                
         response.send(player.getSocket(), player); 
@@ -402,22 +412,26 @@ public class GameManager {
             Constructor constructor = gameClazz.getConstructor(new Class[]{});
             loadedGame = (Game) constructor.newInstance(new Object[]{});
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "There is no game class with this name.");
+            //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "There is no game class with this name.");
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.severe, "There is no game class with this name.");
             ForceCloseMessage forceCloseMessage = new ForceCloseMessage("There is no GameLogic class for this game.");
             forceCloseMessage.send(player.getSocket(), player);
         } catch (InvocationTargetException | IllegalArgumentException | IllegalAccessException | InstantiationException | SecurityException | NoSuchMethodException ex) {
-            Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "Game could not be instantiated. Check the constructor of your GameLogic class."
-                    + "Most probably the constructor of the GameLogic class is not parameterless.", ex);
+            //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "Game could not be instantiated. Check the constructor of your GameLogic class."
+            //LOG//        + "Most probably the constructor of the GameLogic class is not parameterless.", ex);
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.severe, "Game could not be instantiated. Check the constructor of your GameLogic class. Most probably the constructor of the GameLogic class is not parameterless.", ex);
             ExceptionMessage exceptionMessage = new ExceptionMessage((Exception) ex.getCause());
             exceptionMessage.send(player.getSocket(), player);
         } catch (NullPointerException ex) {
-            Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "There is no GameLogic class for this game:" + gameName);
+            //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "There is no GameLogic class for this game:" + gameName);
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.severe, "There is no GameLogic class for this game:" + gameName);
             ForceCloseMessage forceCloseMessage = new ForceCloseMessage("There is no GameLogic class for this game: " + gameName);
             forceCloseMessage.send(player.getSocket(), player);
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "An unknown error occured: " + ex.getMessage());
+            //LOG//Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, "An unknown error occured: " + ex.getMessage());
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.severe, "An unknown error occured: " + ex.getMessage());
             ForceCloseMessage forceCloseMessage = new ForceCloseMessage("An unknown error occured whle loading the game. Please look at the logs");
             forceCloseMessage.send(player.getSocket(), player);
         }
@@ -450,7 +464,8 @@ public class GameManager {
                 if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
                     // Refresh GUI
                     ServerGUI.getInstance().removeGameFromList(game, false);
-                    Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());                    
+                    //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());
+                    LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "Removed the game {0} from the running games list.", game.toString());
                 }
 
                 // Remove the player who is the reason on why the game has to be
@@ -465,7 +480,8 @@ public class GameManager {
                 waitingGames.remove(game);
                 // Refresh GUI
                 ServerGUI.getInstance().removeGameFromList(game, true);
-                Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
+                //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
+                LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "Removed the game {0} from the waiting games list.", game.toString());
                 game.removePlayer(terminatingPlayer);
                 ForceCloseMessage forceCloseMessage = new ForceCloseMessage(reason);
                 game.sendMessageToAllPlayers(forceCloseMessage);
@@ -505,14 +521,16 @@ public class GameManager {
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
                 ServerGUI.getInstance().removeGameFromList(game, false);
             }
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the running games list.", game.toString());
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "Removed the game {0} from the running games list.", game.toString());
         } // End game if it is a waiting game.
         else if (waitingGames.contains(game)) {
             waitingGames.remove(game);
             if(ServerConfiguration.getInstance().getIsConsoleMode() == false){
                 ServerGUI.getInstance().removeGameFromList(game, true);
             }
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Removed the game {0} from the waiting games list.", game.toString());
+            LogRouter.log(GameManager.class.getName(), LoggingLevel.game, "Removed the game {0} from the waiting games list.", game.toString());
         }
     }
 

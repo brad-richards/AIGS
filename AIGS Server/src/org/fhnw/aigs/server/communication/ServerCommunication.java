@@ -3,9 +3,10 @@ package org.fhnw.aigs.server.communication;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.logging.*;
 import javax.swing.JOptionPane;
-import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
+import org.fhnw.aigs.server.common.ServerConfiguration;
 
 /**
  * This class is responsible for the outgoing connections. It connects the
@@ -14,8 +15,9 @@ import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
  * order to get to an instance, use {@link ServerCommunication#getInstance}
  * instead.<br>
  * v1.0 Initial release<br>
- * v1.1 Functional changes
- * @version 1.1 (Raphael Stoeckli, 01.08.2014)
+ * v1.1 Functional changes<br>
+ * v1.2 Changing of logging
+ * @version 1.2 (Raphael Stoeckli, 24.02.2015)
  * @author Matthias Stöckli (v1.0)
  */
 public class ServerCommunication implements Runnable {
@@ -88,7 +90,8 @@ public class ServerCommunication implements Runnable {
         }
         catch (IOException ex)
         {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Could not close server socket", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Could not close server socket", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Could not close server socket", ex);
         }
     }
     
@@ -112,7 +115,8 @@ public class ServerCommunication implements Runnable {
                 }
                 catch(IOException ex)
                 {
-                    Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Could not close client socket", ex);
+                    //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Could not close client socket", ex);
+                    LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Could not close client socket", ex);
                 }
             }
             if (s.isClosed() == true)
@@ -137,7 +141,8 @@ public class ServerCommunication implements Runnable {
                 Socket clientSocket = ServerCommunication.serverSocket.accept();
                 clientSockets.add(clientSocket);
                 cleanupThreads(false); // Only clean up closed connections
-                Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "New connection established! Address: {0}", clientSocket.getInetAddress());
+                //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "New connection established! Address: {0}", clientSocket.getInetAddress());
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "New connection established! Address: {0}", clientSocket.getInetAddress());
 
                 // Create new Thread of ServerMessageBroker for new connection and start the thread
                 Thread serverMessageBrokerThread = new Thread(new ServerMessageBroker(clientSocket));
@@ -148,16 +153,19 @@ public class ServerCommunication implements Runnable {
         } catch (IOException ex) {
             if (runState) // Error while running
             {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not establish connection", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not establish connection", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "Could not establish connection", ex);
             }
             else // Connection closed
             {
-             Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Connection was interrupted due to shutdown", ex);   
+             //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Connection was interrupted due to shutdown", ex);   
+             LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Connection was interrupted due to shutdown", ex);   
             }
         }
         catch (Exception ex) // All other Exceptions
         {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknown exception occurred while establishing connection", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknown exception occurred while establishing connection", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "An unknown exception occurred while establishing connection", ex);
         }
     }
 
@@ -170,19 +178,22 @@ public class ServerCommunication implements Runnable {
 
         do {
             try {
-                Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Try to connect to port {0}", port);
+                //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Try to connect to port {0}", port);
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "Try to connect to port {0}", port);
                 serverSocket = new ServerSocket(port);                          // Tries to establish a connection on the standard port
                 serverSetupSuccessful = true;
                 continue;
             } catch (IOException ex) {
-                Logger.getLogger(ServerCommunication.class.getName()).log(Level.SEVERE, "Could not listen to port " + port + ", server will shut down.", ex);
+                //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.SEVERE, "Could not listen to port " + port + ", server will shut down.", ex);
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "Could not listen to port " + port + ", server will shut down.", ex);
                 JOptionPane.showMessageDialog(null, "Could not connect. Another instance of the AIGS seems to be running.", "There is a problem.", JOptionPane.ERROR_MESSAGE);
 
                 System.exit(1);
             }
             catch (Exception ex) // All other exceptions
             {
-                Logger.getLogger(ServerCommunication.class.getName()).log(Level.SEVERE, "An unknown Error occurred. Server will shut down.", ex);
+                //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.SEVERE, "An unknown Error occurred. Server will shut down.", ex);
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "An unknown Error occurred. Server will shut down.", ex);
                 JOptionPane.showMessageDialog(null, "An unknown Error occurred", "There is a problem.", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }
@@ -198,7 +209,8 @@ public class ServerCommunication implements Runnable {
             while (input.matches(portRegex) == false || input.equals("exit")) {
                 input = scanner.next();                                         // Get the string input from console
                 if (input.equals("exit")) {                                     // Check for the keyword "exit"
-                    Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Shut down server...");
+                    //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Shut down server...");
+                    LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.system, "Shut down server...");
                     System.exit(0);                                             // ShutdownCleanUp will take care of the rest
 
                     // If the input matches the port regex, the server tries to establish a connection under the new port number
@@ -206,11 +218,13 @@ public class ServerCommunication implements Runnable {
                     port = Integer.parseInt(input);
                     break;
                 } else {
-                    Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Invalid port number '{0}'. Please enter a number between 0 and 65535", port);
+                    //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Invalid port number '{0}'. Please enter a number between 0 and 65535", port);
+                    LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Invalid port number '{0}'. Please enter a number between 0 and 65535", port);
                 }
             }
         } while (serverSetupSuccessful == false);
-        Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Connected successfully to port {0}, start listening...\nExternal IP: " + getExternalIp(), port);
+        //LOG//Logger.getLogger(ServerCommunication.class.getName()).log(Level.INFO, "Connected successfully to port {0}, start listening...\nExternal IP: " + getExternalIp(), port);
+        LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "Connected successfully to port {0}, start listening...\nExternal IP: " + getExternalIp(), port);
     }
 
     /**

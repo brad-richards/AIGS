@@ -1,5 +1,7 @@
 package org.fhnw.aigs.server.gameHandling;
 
+import org.fhnw.aigs.server.common.Main;
+import org.fhnw.aigs.server.common.ServerConfiguration;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,10 +10,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.tools.ant.*;
-
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 
 /**
  * This class is responsible is part of the plug-in mechanism. A game logic
@@ -26,10 +27,11 @@ import org.apache.tools.ant.*;
  * collection.<br>
  * v1.0 Initial release<br>
  * v1.1 Functional changes<br>
- * v1.2 Added new methods
+ * v1.2 Added new methods<br>
+ * v1.3 Changing of logging
  *
  * @author Matthias Stöckli (v1.0)
- * @version 1.2 (Raphael Stoeckli, 07.10.2014)
+ * @version 1.3 (Raphael Stoeckli, 24.02.2015)
  */
 public class GameLoader extends URLClassLoader {
 
@@ -76,7 +78,8 @@ public class GameLoader extends URLClassLoader {
         String gamelibsDirectory = ServerConfiguration.getInstance().getGamelibsDirectory();
         if (GameLoader.checkFolderExists(gamelibsDirectory, true) == false)
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "The gamelibs folder could not be created. Check the server installation!");
         }
         File dir = new File(gamelibsDirectory);
         File[] files = dir.listFiles();
@@ -122,7 +125,8 @@ public class GameLoader extends URLClassLoader {
         String gamelibsDirectory = ServerConfiguration.getInstance().getGamelibsDirectory();
         if (GameLoader.checkFolderExists(gamelibsDirectory, true) == false)
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The gamelibs folder could not be created. Check the server installation!");
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "The gamelibs folder could not be created. Check the server installation!");
         }
         
         File jarFolder = new File(gamelibsDirectory);
@@ -157,11 +161,13 @@ public class GameLoader extends URLClassLoader {
             }
             aigsCommonsURL = new URL("file:lib/AIGS_Commons.jar");
         } catch (MalformedURLException ex) {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Could not load jar.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Could not load jar.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "Could not load jar.", ex);
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "An unknown error occurred.", ex);
         }
 
         // Create a new URLClassLoader using reflection (newInstance)
@@ -176,13 +182,16 @@ public class GameLoader extends URLClassLoader {
             addMethod = classLoaderClazz.getDeclaredMethod("addURL", new Class[]{URL.class});
             addMethod.setAccessible(true);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The method 'addURL' does not exist.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The method 'addURL' does not exist.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "The method 'addURL' does not exist.", ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Security was violated.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Security was violated.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "Security was violated.", ex);
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "An unknown error occurred.", ex);
         }
 
         // Add the URLs to the jars to the newly creasted URLClassLoader.
@@ -190,11 +199,13 @@ public class GameLoader extends URLClassLoader {
             addMethod.invoke(newClassLoader, gameJarURL);
             addMethod.invoke(newClassLoader, commonsJarURL);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "URL could not be added.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "URL could not be added.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "URL could not be added.", ex);
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "An unknown error occurred.", ex);
         }
 
         return newClassLoader;
@@ -219,7 +230,8 @@ public class GameLoader extends URLClassLoader {
         try {
             p.executeTarget("rebuildGames");
         } catch (BuildException ex) {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Could not load jar.", ex);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "Could not load jar.", ex);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "Could not load jar.", ex);
             state = false;
         }
         allClassLoaders.clear();
@@ -256,7 +268,8 @@ public class GameLoader extends URLClassLoader {
                 }
                 else
                 {
-                    Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The defined path '" + path + "' is not a folder");
+                    //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "The defined path '" + path + "' is not a folder");
+                    LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "The defined path '" + path + "' is not a folder");
                     return false; //
                 }
             }
@@ -265,12 +278,14 @@ public class GameLoader extends URLClassLoader {
                if (createEmptyFolder == true)
                {
                    f.mkdir();
-                   Logger.getLogger(GameLoader.class.getName()).log(Level.INFO, "The folder '" + path + "' was created");
+                   //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.INFO, "The folder '" + path + "' was created");
+                   LogRouter.log(GameLoader.class.getName(), LoggingLevel.info, "The folder '" + path + "' was created");
                    return true;
                }
                else
                {
-                   Logger.getLogger(GameLoader.class.getName()).log(Level.WARNING, "The folder '" + path + "' does not exist");
+                   //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.WARNING, "The folder '" + path + "' does not exist");
+                   LogRouter.log(GameLoader.class.getName(), LoggingLevel.waring, "The folder '" + path + "' does not exist");
                    return false;
                }
             }
@@ -278,7 +293,8 @@ public class GameLoader extends URLClassLoader {
         }
         catch(Exception e)
         {
-            Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "There is a problem with the path '" + path + "' (does not exist)", e);
+            //LOG//Logger.getLogger(GameLoader.class.getName()).log(Level.SEVERE, "There is a problem with the path '" + path + "' (does not exist)", e);
+            LogRouter.log(GameLoader.class.getName(), LoggingLevel.severe, "There is a problem with the path '" + path + "' (does not exist)", e);
             return false;
         }
     }

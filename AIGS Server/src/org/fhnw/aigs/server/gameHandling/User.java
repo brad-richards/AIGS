@@ -8,8 +8,6 @@ import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.bind.JAXB;
@@ -19,17 +17,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import org.fhnw.aigs.commons.communication.IdentificationResponseMessage;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 import org.fhnw.aigs.server.gui.ServerGUI;
+import org.fhnw.aigs.server.common.ServerConfiguration;
 
 /**
  * This class is responsible for all User related tasks. It loads generates user
  * files, loads users, logs them on and off.<br>
  * v1.0 Initial release<br>
  * v1.1 Major changes in handling<br>
- * v1.1.1 Bugfixes
+ * v1.1.1 Bugfixes<br>
+ * v1.2 Changing of logging
  *
  * @author Matthias Stöckli
- * @version 1.1.1 (Raphael Stoeckli, 06.11.2014)
+ * @version 1.2 (Raphael Stoeckli, 24.02.2015)
  */
 @XmlRootElement(name = "User")
 public class User {
@@ -369,7 +371,8 @@ public class User {
      */
     private static void readUsersFromPlainText() throws IOException, JAXBException {
         File userFile = new File("conf/users.txt");
-        Logger.getLogger(User.class.getName()).log(Level.INFO, "Generating users from text file...");
+        //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "Generating users from text file...");
+        LogRouter.log(User.class.getName(), LoggingLevel.info, "Generating users from text file...");
 
         // Reads the file.
         InputStreamReader inputStreamReader = new FileReader(userFile);
@@ -390,13 +393,15 @@ public class User {
                 // Create a new user based on the name and password/identification code
                 User user = new User(name, identificationCode);
                 User.addUserToUserList(user);
-                Logger.getLogger(User.class.getName()).log(Level.INFO, "New user: {0}", name);
+                //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "New user: {0}", name);
+                LogRouter.log(User.class.getName(), LoggingLevel.info, "New user: {0}", name);
             }
         }
         // Save the file to "conf/usersXml.xml".
         File outputFile = new File("conf/usersXml.xml");
         JAXB.marshal(users, outputFile);
-        Logger.getLogger(User.class.getName()).log(Level.INFO, "Successfully created {0} users and saved to config file.", users.size());
+        //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "Successfully created {0} users and saved to config file.", users.size());
+        LogRouter.log(User.class.getName(), LoggingLevel.info, "Successfully created {0} users and saved to config file.", users.size());
     }
     
     /**
@@ -556,7 +561,8 @@ public class User {
             User user = users.get(i);
             if (user.getUserName().equals(name)) {
                 users.get(i).loggedIn = false;
-                Logger.getLogger(User.class.getName()).log(Level.INFO, "Marked player " + user.getUserName() + " as being offline.", users.size());
+                //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "Marked player " + user.getUserName() + " as being offline.", users.size());
+                LogRouter.log(User.class.getName(), LoggingLevel.info, "Marked player " + user.getUserName() + " as being offline.", users.size());
             }
         }
     }
@@ -571,9 +577,11 @@ public class User {
         if (userConfigFile.exists()) {
             // Parse the user configuration file's content directly using JAXB
             users = (User.UserList) JAXB.unmarshal(userConfigFile, User.UserList.class);
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "Read user configuration.");
+            //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "Read user configuration.");
+            LogRouter.log(User.class.getName(), LoggingLevel.system, "Read user configuration.");
         } else {
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be read. Creating an empty user list.");
+            //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be read. Creating an empty user list.");
+            LogRouter.log(User.class.getName(), LoggingLevel.system, "User configuration file could not be read. Creating an empty user list.");
             users = new UserList();
         }
         return users;
@@ -597,11 +605,13 @@ public class User {
         try
         {
             JAXB.marshal(tempList, userConfigFile);
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "Write user configuration.");
+            //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "Write user configuration.");
+            LogRouter.log(User.class.getName(), LoggingLevel.system, "Write user configuration.");
         }
         catch(Exception ex)
         {
-            Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be written.");
+            //LOG//Logger.getLogger(User.class.getName()).log(Level.INFO, "User configuration file could not be written.");
+            LogRouter.log(User.class.getName(), LoggingLevel.system, "User configuration file could not be written.");
         }
     }
     

@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import org.fhnw.aigs.commons.communication.Message;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -15,10 +14,11 @@ import javax.xml.transform.stream.*;
 /**
  * This class provides XML-centred helper methods.<br>
  * v1.0 Initial release<br>
- * v1.1 Added some further error handling
+ * v1.1 Added some further error handling<br>
+ * v1.2 Changing of logging
  *
  * @author Matthias Stöckli (v1.0)
- * @version v1.1 (Raphael Stoeckli, 22.10.2014)
+ * @version v1.2 (Raphael Stoeckli, 26.02.2015)
  */
 public class XMLHelper {
 
@@ -68,8 +68,9 @@ public class XMLHelper {
             }
        }
        if (processingError == true)
-       {
-           Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, errorMessage, outputException);
+       {         
+          // Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, errorMessage, outputException);
+           LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, errorMessage, outputException);
        }
         return marshaller;
 
@@ -94,13 +95,16 @@ public class XMLHelper {
             StringBuffer buffer = writer.getBuffer();
             return buffer.toString();
         } catch (TransformerConfigurationException ex) {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
         } catch (TransformerException ex) {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
+            //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
+            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, "An unknown error occured.", ex);
         }
         return "";
     }
@@ -145,11 +149,13 @@ public class XMLHelper {
                 jaxbContext.generateSchema(sor);
             }
         } catch (JAXBException ex) {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
+            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
         }
         catch (IOException | ClassNotFoundException ex) // All other exceptions
         {
-            Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
+           // Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, "An unknown error occured.", ex);
+            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, "An unknown error occured.", ex);
         }
 
     }

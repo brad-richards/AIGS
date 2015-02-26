@@ -1,11 +1,14 @@
 package org.fhnw.aigs.server.communication;
 
+import org.fhnw.aigs.server.common.ServerConfiguration;
 import org.fhnw.aigs.commons.communication.*;
 import java.io.*;
 import java.net.*;
 import java.util.logging.*;
 import javax.xml.parsers.*;
 import org.fhnw.aigs.commons.*;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 import org.fhnw.aigs.server.gameHandling.GameManager;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -20,10 +23,11 @@ import org.fhnw.aigs.server.gameHandling.*;
  * assigned to the game connected to the ServerMessageBroker.<br>
  * v1.0   Initial release<br>
  * v1.1   Functional changes<br>
- * v1.1.1 Minor changes (due to changes in other classes)
+ * v1.1.1 Minor changes (due to changes in other classes)<br>
+ * v1.2 Changing of logging
  *
  * @author Matthias Stöckli (v1.0)
- * @version 1.1.1 (Raphael Stoeckli, 27.10.2014)
+ * @version 1.2 (Raphael Stoeckli, 24.02.2015)
  */
 public class ServerMessageBroker implements Runnable {
 
@@ -61,7 +65,7 @@ public class ServerMessageBroker implements Runnable {
      * variable can help tracking exceptions.
      */
     private boolean connectionOpen = true;
-
+   
     /**
      * Initializes the ServerMessageBroker and sets up a {@link Socket}.<br>
      * This class is responsible for parsing, interpreting and passing messages
@@ -71,7 +75,7 @@ public class ServerMessageBroker implements Runnable {
      * @param socket Socket which connects the client to the server.
      */
     public ServerMessageBroker(Socket socket) throws IOException {
-        this.socket = socket;
+        this.socket = socket;       
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
     }
 
@@ -80,7 +84,8 @@ public class ServerMessageBroker implements Runnable {
      */
     @Override
     public void run() {
-        Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Server ready, waiting for incoming messages...");
+        //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Server ready, waiting for incoming messages...");
+        LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "Server ready, waiting for incoming messages...");
         listenForMessages();
     }
 
@@ -99,7 +104,8 @@ public class ServerMessageBroker implements Runnable {
                 Message parsedMessage = parseInput(inputString);
 
                 if (parsedMessage instanceof KeepAliveMessage == false) {
-                    printMessage(inputString);
+                    //printMessage(inputString);
+                    LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "<= {0}", inputString);
                 }
                 checkForNonGameMessages(parsedMessage);
                 
@@ -132,7 +138,8 @@ public class ServerMessageBroker implements Runnable {
                     socket.close();
                     in.close();
                     connectionOpen = false;
-                    Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An exception in the game forced the server to close the following game: " + game.toString(), ex);
+                    //LOGLogger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An exception in the game forced the server to close the following game: " + game.toString(), ex);
+                    LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "An exception in the game forced the server to close the following game: " + game.toString(), ex);
                 } 
             }
         } catch (IOException ex) {
@@ -142,7 +149,8 @@ public class ServerMessageBroker implements Runnable {
                 in.close();
                 connectionOpen = false;
             } catch (IOException ex2) {
-                Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "The connection could not be closed", ex2);
+                //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "The connection could not be closed", ex2);
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "The connection could not be closed", ex2);
             }
         }
         catch (Exception ex) // All other exceptions
@@ -153,7 +161,8 @@ public class ServerMessageBroker implements Runnable {
                 in.close();
                 connectionOpen = false;
             } catch (IOException ex2) {
-                Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "The connection could not be closed", ex2);
+                //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "The connection could not be closed", ex2);
+                LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, "The connection could not be closed", ex2);
             }            
         }
     }
@@ -190,12 +199,14 @@ public class ServerMessageBroker implements Runnable {
             Class messageClass = Class.forName(messageClassPath, true, loader);
             return Message.parse(reader, messageClass);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not find a matching class. Check the package name, @XmlElement annotations and the jars.", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not find a matching class. Check the package name, @XmlElement annotations and the jars.", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Could not find a matching class. Check the package name, @XmlElement annotations and the jars.", ex);
             return null;
         }
         catch (Exception ex) // All other exceptions
         {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknown error occurred.", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "An unknown error occurred.", ex);
             return null;        
         }
     }
@@ -220,14 +231,16 @@ public class ServerMessageBroker implements Runnable {
             return DOMDocument.getDocumentElement().getAttribute("FullyQualifiedClassName");
 
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not parse input into xml format." + "Client sent the following string: \n{0}", inputString);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "Could not parse input into xml format." + "Client sent the following string: \n{0}", inputString);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "Could not parse input into xml format." + "Client sent the following string: \n{0}", inputString);
             BadInputMessage badInputMessage = new BadInputMessage(inputString);
             badInputMessage.send(socket, player);
             return null;
         }
         catch (Exception ex) // All other Exceptions
         {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknonw error occurred.", ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, "An unknonw error occurred.", ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.waring, "An unknonw error occurred.", ex);
             BadInputMessage badInputMessage = new BadInputMessage(inputString);
             badInputMessage.send(socket, player);
             return null;            
@@ -314,9 +327,11 @@ public class ServerMessageBroker implements Runnable {
         try {
             socket.close();
             in.close();
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Connection successfully closed.");
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "Connection successfully closed.");
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.info, "Connection successfully closed.");
         } catch (IOException ex) {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, null, ex);
+            //LOG//Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.SEVERE, null, ex);
+            LogRouter.log(ServerMessageBroker.class.getName(), LoggingLevel.severe, null, ex);
         }
         GameManager.terminateGame(game, player, clientClosedMessage.getReason());
         connectionOpen = true;
@@ -355,21 +370,5 @@ public class ServerMessageBroker implements Runnable {
         KeepAliveManager.handleResponse(keepAliveMessage);
         nonGameMessageReceived = true;
     }
-
-    /**
-     * Shows the received message. If the option IsCompactLoggingEnabled" is set
-     * to <b>True</b> in the {@link ServerConfiguration}, the output will be
-     * made on one line, otherwise it will be formatted.
-     *
-     * @param inputString The string to be formatted.
-     */
-    private void printMessage(String inputString) {
-        currentPrettyPrintedMessage = XMLHelper.prettyPrintXml(inputString);
-
-        if (ServerConfiguration.getInstance().getIsCompactLoggingEnabled()) {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "<= {0}", inputString);
-        } else {
-            Logger.getLogger(ServerMessageBroker.class.getName()).log(Level.INFO, "<= \n{0}", currentPrettyPrintedMessage);
-        }
-    }
+    
 }

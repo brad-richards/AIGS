@@ -1,0 +1,12 @@
+Compiler troubleshooting
+------------------------
+
+In case of building problems...
+
+- Javadoc:
+use compiler flag "-Xdoclint:none" to suppress warnings/errors from the very strict jre8 javadoc compilter
+
+- Application / JAR:
+use compiler flag "-XDignore.symbol.file=true" if the JAR won't compile.
+Especially NetBeans seems to have issues with the package "sun.util.logging".
+The compiler aborts the building process in this case with the message. "package sun.util.logging does not exist". Could be a problem of Javac. In Eclipse, the building process seems to work fine.

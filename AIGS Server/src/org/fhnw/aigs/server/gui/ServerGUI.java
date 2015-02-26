@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -39,15 +38,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.metal.MetalBorders;
 import org.fhnw.aigs.commons.Game;
 import org.fhnw.aigs.commons.Player;
+import org.fhnw.aigs.server.common.LogRouter;
+import org.fhnw.aigs.server.common.LoggingLevel;
 import org.fhnw.aigs.server.communication.ServerCommunication;
 import org.fhnw.aigs.server.gameHandling.GameManager;
-import org.fhnw.aigs.server.gameHandling.LoggerTextAreaHandler;
 import org.fhnw.aigs.server.gameHandling.RecompileClassesAction;
 import org.fhnw.aigs.server.gameHandling.ReloadClassesAction;
-import org.fhnw.aigs.server.gameHandling.ServerConfiguration;
-import org.fhnw.aigs.server.gameHandling.ShowLogsAction;
-import org.fhnw.aigs.server.gameHandling.StartServerAction;
-import org.fhnw.aigs.server.gameHandling.StopServerAction;
+import org.fhnw.aigs.server.common.ServerConfiguration;
+import org.fhnw.aigs.server.common.ShowLogsAction;
 import org.fhnw.aigs.server.gameHandling.User;
 
 /**
@@ -79,8 +77,9 @@ import org.fhnw.aigs.server.gameHandling.User;
  * the server start.<br>
  * <br>v1.1 New functions and fixes
  * <br>v1.2 New functions (settings and user management) and change from static to singleton
+ * <br>v1.3 Changing of logging
  * @author Matthias Stöckli
- * @version v1.2 (Raphael Stoeckli, 15.10.2014)
+ * @version v1.3 (Raphael Stoeckli, 24.02.2015)
  */
 public class ServerGUI extends JFrame {
     
@@ -144,6 +143,16 @@ public class ServerGUI extends JFrame {
     private JLabel idLabel;
     private JLabel ipLabel;
     private JButton endGameButton;
+    
+    private LimitLinesDocumentListener  logListener;
+
+    public LimitLinesDocumentListener getLogListener() {
+        return logListener;
+    }
+
+    public void setLogListener(LimitLinesDocumentListener logListener) {
+        this.logListener = logListener;
+    }
     
     /**
      * Constructor of GUI class
@@ -379,7 +388,8 @@ public class ServerGUI extends JFrame {
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
+            //LOG//Logger.getLogger(ServerGUI.class.getName()).log(Level.SEVERE, null, ex);
+            LogRouter.log(ServerGUI.class.getName(), LoggingLevel.severe, null, ex);
         }
     }
     
@@ -527,6 +537,8 @@ public class ServerGUI extends JFrame {
         logTextArea.setEditable(false);
         logTextArea.setFont(new Font("Dialog", Font.PLAIN, 12));
         logTextArea.setWrapStyleWord(true);
+        this.logListener = new LimitLinesDocumentListener(ServerConfiguration.getInstance().getLinesToLog());
+        logTextArea.getDocument().addDocumentListener(this.logListener); // Limits the number of lines
         logTextAreaScrollPane = new JScrollPane(logTextArea);
         logTextAreaScrollPane.setBorder(BorderFactory.createTitledBorder(new MetalBorders.TextFieldBorder(), "Server Log"));
         Logger rootLogger = Logger.getLogger("");

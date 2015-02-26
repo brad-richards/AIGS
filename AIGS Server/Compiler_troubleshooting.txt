@@ -4,7 +4,7 @@ Compiler troubleshooting
 In case of building problems...
 
 - Javadoc:
-use compiler flag "-Xdoclint:none" to suppress warnings/errors from the very strict jre8 javadoc compilter
+use compiler flag "-Xdoclint:none" to suppress warnings/errors from the very strict jre8 javadoc compiler
 
 - Application / JAR:
 use compiler flag "-XDignore.symbol.file=true" if the JAR won't compile.

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configuration>
+    <GameSourcesDirectory>./games</GameSourcesDirectory>
+    <GamelibsDirectory>./gamelibs</GamelibsDirectory>
+    <HidesOnClose>false</HidesOnClose>
+    <IsAnonymousLoginAllowed>true</IsAnonymousLoginAllowed>
+    <IsConsoleMode>false</IsConsoleMode>
+    <IsMultiLoginAllowed>false</IsMultiLoginAllowed>
+    <KeepAliveTimeOut>10000</KeepAliveTimeOut>
+    <LinesToLog>500</LinesToLog>
+    <LogDirectory>./logs</LogDirectory>
+    <LoggerStyle>compressed</LoggerStyle>
+    <LoggerThreshold>severeSystemGame</LoggerThreshold>
+    <PortNumber>25123</PortNumber>
+    <UseKeepAliveManager>false</UseKeepAliveManager>
+    <WhatIsMyIpUrl>http://icanhazip.com/</WhatIsMyIpUrl>
+</Configuration>

@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -19,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -27,9 +30,11 @@ import org.fhnw.aigs.server.gameHandling.User;
 /**
  * This class represents a window to manage the user settings. These settings 
  * will be stored in {@link User#users}. The user management is only applying 
- * if anonymous login is disable (users have to log in).
+ * if anonymous login is disable (users have to log in).<br>
+     * v1.0 Initial release<br>
+     * v1.1 Changing look&amp;feel to 'Nimbus' (Platform independent)
  * @author Raphael Stoeckli (29.10.2014)
- * @version 1.0
+ * @version 1.1 (Raphael Stoeckli (13.04.2015)
  */
 public class UserSettingsWindow extends JDialog {
     
@@ -52,6 +57,8 @@ public class UserSettingsWindow extends JDialog {
      */
     public UserSettingsWindow()
     {
+        setLookAndFeel("Nimbus"); // Tested: "Nimbus", "Windows"
+        
         ImageIcon logoImage = new ImageIcon(getClass().getResource("/imgs/logo24px.png"));
         this.setIconImage(logoImage.getImage());
         this.setLocationByPlatform(true); // Better positioning of the window
@@ -65,6 +72,40 @@ public class UserSettingsWindow extends JDialog {
         loadData();
         setNewUser();
     }
+    
+    
+    /**
+     * Method to set a specific look and feel (Swing). If the name is not found, {@link javax.swing.UIManager#getCrossPlatformLookAndFeelClassName()} will be used.<br>
+     * This may cause problems with the window and font sizes.
+     * @param name Name of the look and feel theme
+     * @since v1.1
+     */
+    private void setLookAndFeel(String name)
+    {
+        boolean match = false;
+        try {
+         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+             if (name.equals(info.getName())) {
+                 UIManager.setLookAndFeel(info.getClassName());
+                 match = true;
+                 break;
+             }
+         }
+     } catch (Exception e) {
+         match = false;
+     }
+        if (match == false)
+        {
+            try
+            {
+                UIManager.setLookAndFeel(javax.swing.UIManager.getCrossPlatformLookAndFeelClassName());
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SettingsWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+    }    
     
     /**
      * Initilizes the UI. The lower part of this method was genereated by the GUI builder

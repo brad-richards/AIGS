@@ -23,9 +23,11 @@ import org.fhnw.aigs.swingClient.gameHandling.ClientGame;
  * A new party can be started, an existing party can be joined or a 
  * random party can be joined. In case of random joining will a new party
  * be created, if no wating game is present on the server. If a party is startet,
- * it can be defined whether this party is public available or private.
- * @version v1.0
- * @author Raphael Stoeckli (23.10.2014)
+ * it can be defined whether this party is publicly available or private.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Typos
+ * @version v1.0.1 (Raphael Stoeckli, 13.04.2015)
+ * @author Raphael Stoeckli
  */
 public class SetupWindow extends BackgroundPanel{
     
@@ -105,7 +107,7 @@ public class SetupWindow extends BackgroundPanel{
         playerNameField.setBounds(40, 250, 640, 46); 
         playerNameField.setMargin(new Insets(2,10,2,10));
         playerNameField.setText(Settings.getInstance().getDisplayname());
-        publicGameCheckBox = new JCheckBox("Create public available party");
+        publicGameCheckBox = new JCheckBox("Create publicly available party");
         publicGameCheckBox.setFont(checkboxFont);
         publicGameCheckBox.setOpaque(false);
         publicGameCheckBox.setBounds(40, 300, 640, 46); 

@@ -25,9 +25,11 @@ import org.fhnw.aigs.commons.JoinType;
  * A new party can be started, an existing party can be joined or a 
  * random party can be joined. In case of random joining will a new party
  * be created, if no wating game is present on the server. If a party is startet,
- * it can be defined whether this party is public available or private.
- * @version v1.0
- * @author Raphael Stoeckli (23.10.2014)
+ * it can be defined whether this party is publicly available or private.<br>
+ * v1.0 Initial release<br>
+ * v1.0.1 Typos 
+ * @version v1.0.1 (Raphael Stoeckli, 13.04.2015)
+ * @author Raphael Stoeckli
  */
 public class SetupWindow extends BorderPane{
     
@@ -124,9 +126,9 @@ public class SetupWindow extends BorderPane{
             StackPane.setMargin(playerNameField, new Insets(0, 20, 0, 20));      // ... sigh
             sp.getChildren().add(playerNameField); 
 
-            publicGameCheckBox = new CheckBox("Create public available party");
+            publicGameCheckBox = new CheckBox("Create publicly available party");
             publicGameCheckBox.getStyleClass().add("loadingCheckBox");
-            publicGameCheckBox.setTooltip(new Tooltip("If checked, the created party will be public availabel. Random participants jan join in without knowing the party name.\nIf not checked, participants must explicitly state the party name to join in."));
+            publicGameCheckBox.setTooltip(new Tooltip("If checked, the created party will be publicly availabel. Random participants jan join in without knowing the party name.\nIf not checked, participants must explicitly state the party name to join in."));
             publicGameCheckBox.getTooltip().getStyleClass().add("loadingTooltip"); 
             publicGameCheckBox.setTranslateY(280);
            // publicGameCheckBox.setAlignment(Pos.CENTER_LEFT);                 // Not working because of bad design decision of JavaFX creators (?)

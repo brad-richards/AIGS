@@ -1,74 +1,69 @@
 package org.fhnw.aigs.RockPaperScissors.commons;
 
+import org.fhnw.aigs.commons.communication.Message;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.fhnw.aigs.commons.Player;
-import org.fhnw.aigs.commons.communication.Message;
 
 /**
- * Klasse zur Mitteilung des Servers an alle Clients, wer die Mitspieler der Paertie sind.<br>
- * Dies wird zur Darstellung des Gegnernamens benötigt und am Anfang des Spiels enmalig übertragen.<br>
- * Aus Message abgeleitete Klasse.
- * @author Raphael Stoeckli
- * @version v1.0
+ * Class used by the server to send the names of all players to all clients.
  */
-@XmlRootElement(name = "RockPaperScissorsParticipantsMessage")                  // Stellt sicher, dass Daten aus dieser Klasse korrekt in XML umgesetzt und versendet werden können (Kommunikation)
+@XmlRootElement(name = "RockPaperScissorsParticipantsMessage")
 public class RockPaperScissorsParticipantsMessage extends Message
 {
-    // VARIBELDEFINITIONEN
-    private Player playerOne;                                                   // Erster Spieler (willkürliche Reihenfolge)
-    private Player playerTwo;                                                   // Zweiter Spieler (willkürliche Reihenfolge)
+	// RockPaperScissors has only two players
+    private Player playerOne;
+    private Player playerTwo;
 
     /**
-     * Gib ersten Spieler zurück
-     * @return Player-Objekt
+     * Return the first player
+     * @return Player-Object
      */
-    @XmlElement(name = "PlayerOne")                                             // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "PlayerOne")		// Parameter name for XML must be specified for the getter
     public Player getPlayerOne() {
         return playerOne;
     }
 
     /**
-     * Setze ersten Spieler
-     * @param playerOne Player-Objekt
+     * Set the first player
+     * @param playerOne Player-Object
      */
     public void setPlayerOne(Player playerOne) {
         this.playerOne = playerOne;
     }
 
     /**
-     * Gib zweiten Spieler zurück
-     * @return Player-Objekt
+     * Return the second player
+     * @return Player-Object
      */
-    @XmlElement(name = "PlayerTwo")                                             // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "PlayerTwo")		// Parameter name for XML must be specified for the getter
     public Player getPlayerTwo() {
         return playerTwo;
     }
 
     /**
-     * Setze zweiten Spieler
-     * @param playerTwo Player-Objekt
+     * Set the second player
+     * @param playerTwo Player-Object
      */    
     public void setPlayerTwo(Player playerTwo) {
         this.playerTwo = playerTwo;
     }
     
     /**
-     * Parameterloser Standardkonstruktor (wird zwingend benötigt)
+     * Empty constructor (required)
      */    
-    public RockPaperScissorsParticipantsMessage(){                              // Keine weiteren Aktionen notwendig
+    public RockPaperScissorsParticipantsMessage() {
     }
     
     /**
-     * Konstruktor mit Übergabe der Spieler
-     * @param one Erster Spieler
-     * @param two Zweiter Spieler
+     * Constructor, including player info
+     * @param one first player
+     * @param two second player
      */
     public RockPaperScissorsParticipantsMessage(Player one, Player two)
     {
-        super();                                                                // Initialisiere Super-Klasse
-        this.setPlayerOne(one);                                                 // Setze ersten Spieler
-        this.setPlayerTwo(two);                                                 // Setze zweiten Spieler
-    }
-    
+        super();
+        this.setPlayerOne(one);
+        this.setPlayerTwo(two);
+    }    
 }

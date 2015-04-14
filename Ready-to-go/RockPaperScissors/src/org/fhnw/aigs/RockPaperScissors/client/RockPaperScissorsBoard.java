@@ -15,230 +15,211 @@ import org.fhnw.aigs.RockPaperScissors.commons.RockPaperScissorsSelectionMessage
 import org.fhnw.aigs.RockPaperScissors.commons.RockPaperScissorsSymbol;
 
 /**
- * Klasse für Definition des Spielfelds.<br>
- * Die Klasse ist von GridPane abgeleitet und wird im AIGS BaseClient eingebaut
- * @author Raphael Stoeckli
- * @version v1.0
+ * Class defining the game board
  */
-public class RockPaperScissorsBoard extends GridPane {                          // Der zentrale Teil des Spiels basiert immer auf einem GridPane (bei JavaFX)
-    
-    // VARIBELDEFINITIONEN
-    private RockPaperScissorsClientGame clientGame;                             // ClientGame-Objekt
-    private GridPane fieldsPane;                                                // GridPane für eigene Auswahlfelder
-    private GridPane opponentPane;                                              // GridPane für gegnerische Anzeige
-    private Label opponentLabel;                                                // Label für Namen und Punktzahl des Gegners
-    private Label myLabel;                                                      // Label für eigenen Namen und Punktzahl
-    private Separator separator;                                                // Horizontale Linie (zur Gestaltung)
-    private RockPaperScissorsBoardPane opponentField;                           // Anzeigefeld des Gegners
-    private RockPaperScissorsBoardPane rockField;                               // Eigenes Auswahlfeld (Stein)
-    private RockPaperScissorsBoardPane paperField;                              // Eigenes Auswahlfeld (Papier)
-    private RockPaperScissorsBoardPane scissorsField;                           // Eigenes Auswahlfeld (Schere)
-
+public class RockPaperScissorsBoard extends GridPane {
+    private RockPaperScissorsClientGame clientGame;		// ClientGame object
+    private GridPane fieldsPane;						// GridPane for selection fields
+    private GridPane opponentPane;						// GridPane to display opponent's move
+    private Label opponentLabel;						// Label for opponent name and points
+    private Label myLabel;								// Label for our name and points
+    private Separator separator;						// Horizontal line as separator
+    private RockPaperScissorsBoardPane opponentField;	// Pane to display opponent's move
+    private RockPaperScissorsBoardPane rockField;		// Pane to select rock
+    private RockPaperScissorsBoardPane paperField;		// Pane to select paper
+    private RockPaperScissorsBoardPane scissorsField;	// Pane to select scissors
     
     /**
-     * Konstruktor mit Argument
-     * @param clientGame Das ClientGame-Objekt des Spiels
+     * Constructor to build main GUI
+     * @param clientGame The ClientGame object for this game
      */
     public RockPaperScissorsBoard(RockPaperScissorsClientGame clientGame)
     {
-        this.clientGame = clientGame;                                           // Setze ClientGame-Objekt
+        this.clientGame = clientGame;
         
-        opponentField = new RockPaperScissorsBoardPane();                       // Definiere Anzeige des Gegners
-        rockField = new RockPaperScissorsBoardPane();                           // Definiere eigenes Feld für Stein
-        paperField = new RockPaperScissorsBoardPane();                          // Definiere eigenes Feld für Papier
-        scissorsField = new RockPaperScissorsBoardPane();                       // Definiere eigenes Feld für Schere
-        opponentLabel = new Label("Gegner: 0");                                 // Definiere Label für Namen un Punkte des Gegners (wird später überschrieben)
-        myLabel = new Label("Ich: 0");                                          // Definiere einenes Label für Namen un Punkte (wird später überschrieben)
-        separator = new Separator(Orientation.HORIZONTAL);                      // Definiere horizontale Line als Gestaltungselement
-        fieldsPane = new GridPane();                                            // Definiere GridPane für die drei eigenen Felder (Schere, Stein, Papier)
-        opponentPane = new GridPane();                                          // Definiere Gridpane für Anzeige des Gegeners (Muss so gelöst werden, da Element sonst nicht zentriert werden kann)
+        opponentField = new RockPaperScissorsBoardPane();
+        rockField = new RockPaperScissorsBoardPane();
+        paperField = new RockPaperScissorsBoardPane();
+        scissorsField = new RockPaperScissorsBoardPane();
+        opponentLabel = new Label("Gegner: 0");
+        myLabel = new Label("Ich: 0");
+        separator = new Separator(Orientation.HORIZONTAL);
+        fieldsPane = new GridPane();
+        opponentPane = new GridPane();
         
-        opponentField.setSymbol(RockPaperScissorsSymbol.None, GameState.None);  // Leerer Hintergrund
-        rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.None);      // Zeige Stein an        
-        paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.None);    // Zeige Papier an
-        scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.None); //Zeige Schere an
-        opponentLabel.getStyleClass().add("playerLabel");                       // Setze Style des Labels (CSS wurde bereits in Main-Klasse eingebunden)
-        myLabel.getStyleClass().add("playerLabel");                             // Setze Style des Labels (CSS wurde bereits in Main-Klasse eingebunden)
-        separator.getStyleClass().add("separator");                             // Setze Style der horizontalen Linie (CSS wurde bereits in Main-Klasse eingebunden)
+        opponentField.setSymbol(RockPaperScissorsSymbol.None, GameState.None);
+        rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.None);
+        paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.None);
+        scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.None);
+        opponentLabel.getStyleClass().add("playerLabel");
+        myLabel.getStyleClass().add("playerLabel");
+        separator.getStyleClass().add("separator");
         
-        opponentPane.add(opponentField, 0, 0);                                  // Füge Feld des Gegners in GridPane (opponentPane) an Position x0/y0 ein
-        opponentPane.setAlignment(Pos.CENTER);                                  // Zentriere alle Elemente in opponentPane        
-        fieldsPane.add(rockField, 0, 0);                                        // Füge Feld (Stein) zu GridPane (fieldsPane) an Position x0/y0 hinzu
-        fieldsPane.add(paperField, 1, 0);                                       // Füge Feld (Papier) zu GridPane (fieldsPane) an Position x1/y0 hinzu
-        fieldsPane.add(scissorsField, 2, 0);                                    // Füge Feld (Schere) zu GridPane (fieldsPane) an Position x2/y0 hinzu
-        fieldsPane.vgapProperty().set(10);                                      // Definiere vertikalen Rand von 10 Pixel zwischen Elementen von fieldsPane
-        fieldsPane.hgapProperty().set(10);                                      // Definiere horizontalen Rand von 10 Pixel zwischen Elementen von fieldsPane
-        fieldsPane.setPadding(new Insets(10,10,10,10));                         // Definiere Innenrand von 10 Pixel zum (unsichtbaren) Ramen von fieldsPane
-       
-    //    this.fieldsPane.gridLinesVisibleProperty().set(true);                 // Falls eingeblendet: Rahmen von fieldsPane wird angezeigt (DEBUG)
-    //    this.gridLinesVisibleProperty().set(true);                            // Falls eingeblendet: Rahmen von diesem Fenster wird angezeigt (DEBUG)
+        opponentPane.add(opponentField, 0, 0);
+        opponentPane.setAlignment(Pos.CENTER);        
+        fieldsPane.add(rockField, 0, 0);
+        fieldsPane.add(paperField, 1, 0);
+        fieldsPane.add(scissorsField, 2, 0);
+        fieldsPane.vgapProperty().set(10);
+        fieldsPane.hgapProperty().set(10);
+        fieldsPane.setPadding(new Insets(10,10,10,10));
          
-        this.add(opponentLabel, 0, 0);                                          // Füge Label (opponentLabel) im Fenster an Position x0/y0 hinzu
-        this.add(opponentPane, 0, 1);                                           // Füge Pane (opponentPane) im Fenster an Position x0/y1 hinzu
-        this.add(separator, 0, 2);                                              // Füge Spearator (separator) im Fenster an Position x0/y2 hinzu
-        this.add(fieldsPane, 0, 3);                                             // Füge Pane (fieldsPane) im Fenster an Position x0/y3 hinzu
-        this.add(myLabel, 0, 4);                                                // Füge Label (myLabel) im Fenster an Position x0/y4 hinzu
-        this.vgapProperty().set(20);                                            // Definiere vertikalen Rand von 20 Pixel zwischen Elementen vom Fenster
-        this.setAlignment(Pos.CENTER);                                          // Zentriere alle hinzugefügten Elemente des Fensters
+        this.add(opponentLabel, 0, 0);
+        this.add(opponentPane, 0, 1);
+        this.add(separator, 0, 2);
+        this.add(fieldsPane, 0, 3);
+        this.add(myLabel, 0, 4);
+        this.vgapProperty().set(20);
+        this.setAlignment(Pos.CENTER);
                 
-        // EVENTHANDLER                                                         // Drei EventHandler für Auswahlfelder (Schere, Stein, Papier) definieren
+        // Event handlers for the three selection fields
         
-        rockField.setOnMouseClicked(new EventHandler<MouseEvent>() {            // Definition von Eventhandler für Klick auf Stein-Auswahlfeld
-            @Override                                                           // Impementierte Methode
+        rockField.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
             public void handle(MouseEvent event) {
-                setSelectedPane(RockPaperScissorsSymbol.Rock);                  // Markiere Feld als ausgewählt (rufe setSelectedPane auf)
-                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Rock); // Erstelle Nachricht um Server die Auswahl mitzuteilen
-                clientGame.sendMessageToServer(msg);                            // Sende Nachricht an Server (Verbindung wird über ClientGame hergestellt)
+                setSelectedPane(RockPaperScissorsSymbol.Rock);
+                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Rock);
+                clientGame.sendMessageToServer(msg);
             }
         });                
         
-        paperField.setOnMouseClicked(new EventHandler<MouseEvent>() {           // Definition von Eventhandler für Klick auf Papier-Auswahlfeld
-            @Override                                                           // Impementierte Methode
+        paperField.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
             public void handle(MouseEvent event) {
-                setSelectedPane(RockPaperScissorsSymbol.Paper);                 // Markiere Feld als ausgewählt (rufe setSelectedPane auf)
-                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Paper); // Erstelle Nachricht um Server die Auswahl mitzuteilen
-                clientGame.sendMessageToServer(msg);                            // Sende Nachricht an Server (Verbindung wird über ClientGame hergestellt)
+                setSelectedPane(RockPaperScissorsSymbol.Paper);
+                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Paper);
+                clientGame.sendMessageToServer(msg);
             }
         });
         
-        scissorsField.setOnMouseClicked(new EventHandler<MouseEvent>() {        // Definition von Eventhandler für Klick auf Schere-Auswahlfeld
-            @Override                                                           // Impementierte Methode
+        scissorsField.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
             public void handle(MouseEvent event) {
-                setSelectedPane(RockPaperScissorsSymbol.Scissors);              // Markiere Feld als ausgewählt (rufe setSelectedPane auf)
-                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Scissors); // Erstelle Nachricht um Server die Auswahl mitzuteilen
-                clientGame.sendMessageToServer(msg);                            // Sende Nachricht an Server (Verbindung wird über ClientGame hergestellt)    
+                setSelectedPane(RockPaperScissorsSymbol.Scissors);
+                RockPaperScissorsSelectionMessage msg = new RockPaperScissorsSelectionMessage(RockPaperScissorsSymbol.Scissors);
+                clientGame.sendMessageToServer(msg);
             }
         });
   
     }
     
     /**
-     * Methode setzt zuerst alle Felder zurück (Styles) und wählt dann das angegebene Feld aus.<br>
-     * Es werden dabei nur Klassen aus dem CSS ausgetauscht
-     * @param symbol Symbol, welches ausgewählt wurde (Nichts, Schere, Stein, Papier)
+     * Reset the formatting for all selection fields, then mark the selected one.
+     * If nothing is selected, then this just resets the styles; for example, at
+     * the beginning of a new move.
+     * This makes use of classes defined in the CSS
+     * @param symbol Selected symbol
      */
     private void setSelectedPane(RockPaperScissorsSymbol symbol)
     {
-        Platform.runLater(new Runnable() {                                  // WICHTIG! Styles dürfen nicht direkt verändert werden, sondern müssen in Platform.runLater abgearbeitet werden
-        @Override                                                           // Impementierte Methode
+        Platform.runLater(new Runnable() {
+        @Override
         public void run() {
-            rockField.getStyleClass().remove("rockPaperScissorsField");             // Entferne alle Styles vom Stein-Feld
-            rockField.getStyleClass().remove("rockPaperScissorsFieldSelected");     // "
-            paperField.getStyleClass().remove("rockPaperScissorsField");            // Entferne alle Styles vom Papier-Feld
-            paperField.getStyleClass().remove("rockPaperScissorsFieldSelected");    // "
-            scissorsField.getStyleClass().remove("rockPaperScissorsField");         // Entferne alle Styles vom Schere-Feld
-            scissorsField.getStyleClass().remove("rockPaperScissorsFieldSelected"); // "     
-            if (symbol == RockPaperScissorsSymbol.Paper)                            // Setze Style, falls Papier ausgewählt
-            {
+        	// remove any applied styles
+            rockField.getStyleClass().remove("rockPaperScissorsField");
+            rockField.getStyleClass().remove("rockPaperScissorsFieldSelected");
+            paperField.getStyleClass().remove("rockPaperScissorsField");
+            paperField.getStyleClass().remove("rockPaperScissorsFieldSelected");
+            scissorsField.getStyleClass().remove("rockPaperScissorsField");
+            scissorsField.getStyleClass().remove("rockPaperScissorsFieldSelected");
+            
+            // set style as required
+            if (symbol == RockPaperScissorsSymbol.Paper) {
                 paperField.getStyleClass().add("rockPaperScissorsFieldSelected");
-            }
-            else if (symbol == RockPaperScissorsSymbol.Rock)                        // Setze Style, falls Stein ausgewählt
-            {
+            } else if (symbol == RockPaperScissorsSymbol.Rock) {
                 rockField.getStyleClass().add("rockPaperScissorsFieldSelected");
-            }
-            else if (symbol == RockPaperScissorsSymbol.Scissors)                    // Setze Style, falls Schere ausgewählt
-            {
+            } else if (symbol == RockPaperScissorsSymbol.Scissors) {
                 scissorsField.getStyleClass().add("rockPaperScissorsFieldSelected");
             }
         }});
-        // Wurde nichts ausgewählt werden nur alle Styles entfernt (z.B. bei einem neuen Zug)
     }
     
     /**
-     * Methode manipuliert die Bilder (vom Gegner und eigen) und der Text dazu
-     * @param opponentSymbol Symbol, welches vom Gegener gewählt wurde
-     * @param myState Mein Status (Gewonnen, Verloren, Unentschieden)
-     * @param mySymbol Mein ausgewähltes Symbol (Schere, Stein, Papier)
-     * @param opponentName Name des Gegners
-     * @param opponentPoints Punktzahl (total) des Gegners
-     * @param myPoints Meine Punktzahl
+     * Update the GUI: symbols and descriptive texts
+     * @param opponentSymbol Opponents symbol
+     * @param myState Mein Status (won, lost, etc.)
+     * @param mySymbol Our symbol
+     * @param opponentName Opponent's name
+     * @param opponentPoints Opponent's points
+     * @param myPoints Our points
      */
-    public void manipulateGUI(RockPaperScissorsSymbol opponentSymbol, GameState myState, RockPaperScissorsSymbol mySymbol, String opponentName, int opponentPoints, int myPoints){ 
-        manipulateGUI(opponentSymbol, myState, mySymbol);                       // Ruft Methode zum manipulieren der Felder auf
-        manilupateText(opponentName, opponentPoints, myPoints);                 // Ruft Methode zum Manipulieren der Texte auf
+    public void updateGUI(RockPaperScissorsSymbol opponentSymbol, GameState myState, RockPaperScissorsSymbol mySymbol, String opponentName, int opponentPoints, int myPoints){ 
+        setSymbols(opponentSymbol, myState, mySymbol);
+        setNamesAndPoints(opponentName, opponentPoints, myPoints);
     }
     
     /**
-     * Methode manipuliert die Bilder (vom Gegner und eigen)
-     * @param opponentSymbol Symbol, welches vom Gegener gewählt wurde
-     * @param myState Mein Status (Gewonnen, Verloren, Unentschieden)
-     * @param mySymbol Mein ausgewähltes Symbol (Schere, Stein, Papier)
+     * set the symbol images (ours and opponent's), including overlays to show results
+     * @param opponentSymbol Opponent's symbol
+     * @param myState Our status (won, lost, etc.)
+     * @param mySymbol Our symbol
      */
-    public void manipulateGUI(RockPaperScissorsSymbol opponentSymbol, GameState myState, RockPaperScissorsSymbol mySymbol){ 
-        if (myState == GameState.Win)                                           // Falls Ich gewonnen habe...
-        {
-            opponentField.setSymbol(opponentSymbol, GameState.Lose);            // Setze Symbol des Gegners (er hat verloren)
-            if (mySymbol == RockPaperScissorsSymbol.Rock)                       
-            { rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Win); } // Setze Haken, falls ich Stein gewählt habe
-            else if (mySymbol == RockPaperScissorsSymbol.Paper)
-            { paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Win); } // Setze Haken, falls ich Papier gewählt habe
-            else
-            { scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Win); } // Setze Haken, falls ich Schere gewählt habe
-        }
-        else if (myState == GameState.Lose)                                     // Falls ich verloren habe...
-        {
-            opponentField.setSymbol(opponentSymbol, GameState.Win);             // Setze Symbol des Gegners (er hat gewonnen)
-            if (mySymbol == RockPaperScissorsSymbol.Rock)
-            { rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Lose); } // Setze Kreuz, falls ich Stein gewählt habe
-            else if (mySymbol == RockPaperScissorsSymbol.Paper)
-            { paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Lose); } // Setze Kreuz, falls ich Papier gewählt habe
-            else
-            { scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Lose); } // Setze Kreuz, falls ich Schere gewählt habe       
-        }
-        else                                                                    // Fals unentschieden ist...
-        {
-            opponentField.setSymbol(opponentSymbol, GameState.Draw);            // Setze Symbol des Gegners (unentschieden = nur Symbol anzeigen, kein Overlay)
-            rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Draw);         // Setze kein Kreuz oder Haken bei Stein
-            paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Draw);       // Setze kein Kreuz oder Haken bei Papier
-            scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Draw); // Setze kein Kreuz oder Haken bei Schere
+    public void setSymbols(RockPaperScissorsSymbol opponentSymbol, GameState myState, RockPaperScissorsSymbol mySymbol) { 
+        if (myState == GameState.Win) {
+            opponentField.setSymbol(opponentSymbol, GameState.Lose);
+            if (mySymbol == RockPaperScissorsSymbol.Rock) {
+            	rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Win);
+            } else if (mySymbol == RockPaperScissorsSymbol.Paper) {
+            	paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Win);
+            } else {
+            	scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Win);
+        	}
+        } else if (myState == GameState.Lose) {
+            opponentField.setSymbol(opponentSymbol, GameState.Win);
+            if (mySymbol == RockPaperScissorsSymbol.Rock) {
+            	rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Lose);
+            } else if (mySymbol == RockPaperScissorsSymbol.Paper) {
+            	paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Lose);
+            } else {
+            	scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Lose);
+            }       
+        } else { // The move is a draw, no one wins
+            opponentField.setSymbol(opponentSymbol, GameState.Draw);
+            rockField.setSymbol(RockPaperScissorsSymbol.Rock, GameState.Draw);
+            paperField.setSymbol(RockPaperScissorsSymbol.Paper, GameState.Draw);
+            scissorsField.setSymbol(RockPaperScissorsSymbol.Scissors, GameState.Draw);
         }    
     }
     
     /**
-     * Methode manipuliert Texte (Namen und Punktzahlen)<br>
-     * Die Manipulation muss in Platform.runLater erfolgen um einen Absturz zur Laufzeit zu verhindern
-     * @param opponentName Name des Gegners
-     * @param opponentPoints Punktzahl des Gegners
-     * @param myPoints Meine Punktzahl
+     * Set the labels containing names and points.
+     * @param opponentName Opponent's name
+     * @param opponentPoints Opponent's points
+     * @param myPoints Our points
      */
-    public void manilupateText(String opponentName, int opponentPoints, int myPoints)
-    {
-            Platform.runLater(new Runnable() {                                  // WICHTIG! Texte dürfen nicht direkt auf den Labels geändert werden, sondern müssen in Platform.runLater abgearbeitet werden
-            @Override                                                           // Impementierte Methode
+    public void setNamesAndPoints(String opponentName, int opponentPoints, int myPoints) {
+            Platform.runLater(new Runnable() {
+            @Override
             public void run() {
-                opponentLabel.setText(opponentName + ": " + Integer.toString(opponentPoints) + " Punkte"); // Setze Text des Gegners
-                myLabel.setText("Ich: " + Integer.toString(myPoints) + " Punkte"); // Setze meinen Text
+                opponentLabel.setText(opponentName + ": " + Integer.toString(opponentPoints) + " Points");
+                myLabel.setText("Ich: " + Integer.toString(myPoints) + " Points");
             }
-        });       
+        });
     }
     
     /**
-     * Methode ändert Text im Header des Fensters (rechts neben Spielname)
-     * @param text Text, welcher eingesetzt werden soll
+     * Change text in the window header, to the right of the game name.
+     * We access the main window via the ClientGame object
+     * @param text Text to display
      */
-    public void manipulateHeader(String text)
-    {
-        clientGame.getGameWindow().getHeader().setStatusLabelText(text);        // Über ClientGame-Objekt wird das Hauptfenster und den Header darin angesprochen
+    public void setHeader(String text) {
+        clientGame.getGameWindow().getHeader().setStatusLabelText(text);
     }
     
     /**
-     * Methode bereitet den Client auf den nächsten Zug vor
-     * @param message Nachricht, wer mit welchem Symbol gewonnen hat
-     * @param lastTurn Falls es sich um den aller letzten Zug der Partie handelt true, ansonsten false
+     * Prepare the client for the next move
+     * @param message Message to display, from previous move
+     * @param lastTurn True if this was the last move of the game
      */
-   public void nextTurn(String message, boolean lastTurn)
-   {
-       if (lastTurn == false)                                                   // Nicht Letzter Zug
-       {
-        JOptionPane.showMessageDialog(null, message + "\nAuf OK klicken für den nächsten Zug.", "Zug beendet", JOptionPane.INFORMATION_MESSAGE); // Zeige Dialogbox an
+   public void nextTurn(String message, boolean lastTurn) {
+       if (!lastTurn) {
+    	   JOptionPane.showMessageDialog(null, message + "\nClick OK for the next move.", "Move finished", JOptionPane.INFORMATION_MESSAGE);
+       } else { // last move
+    	   JOptionPane.showMessageDialog(null, message + "\nClick OK to see the winner.", "Move finished", JOptionPane.INFORMATION_MESSAGE);
        }
-       else                                                                     // Letzter Zug
-       {
-        JOptionPane.showMessageDialog(null, message + "\nAuf OK klicken um den Gewinner aller Züge anzuzeigen.", "Zug beendet", JOptionPane.INFORMATION_MESSAGE); // Zeige Dialogbox an
-       }
-       manipulateGUI(RockPaperScissorsSymbol.None, GameState.None, RockPaperScissorsSymbol.None); // Auswahl des Gegners, sowie Kreuz und Haken entfernen für neuen Zug
-       setSelectedPane(RockPaperScissorsSymbol.None);                           // Die eigenen Auswahl für den nächsten Zug entfernen
-       manipulateHeader("Warte auf Zug von Gegenspieler...");                   // Setze Status-Text im Header
-   }
- 
+       // Reset the displayed selections, to prepare for the next move
+       setSymbols(RockPaperScissorsSymbol.None, GameState.None, RockPaperScissorsSymbol.None);
+       setSelectedPane(RockPaperScissorsSymbol.None);
+       setHeader("Waiting for opponent's move...");
+   } 
 }

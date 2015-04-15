@@ -5,56 +5,52 @@ import org.fhnw.aigs.RockPaperScissors.commons.RockPaperScissorsSymbol;
 import org.fhnw.aigs.commons.Player;
 
 /**
- * Klasse zur Darstellung des aktuellen Zuges (Turn) eines Spielers. Objekte dieser Klasse werden auf dem Server für die Verwaltung der Züge benötigt
- * @author Raphael Stoeckli
- * @version v1.0
+ * Represents a move (turn) by a player. Objects of this class are managed by the server and used to determine who wins each round.
  */
 public class RockPaperScissorsTurn {
-    
-    // VARIBELDEFINITIONEN   
-    private Player player;                                                      // Spieler (Player) des Zuges 
-    private boolean hasTurnFinished;                                            // Gibt an, ob der aktuelle Zug beendet wurde (true), oder noch nicht (false)
-    private RockPaperScissorsSymbol turnSymbol;                                 // Gewähltes Symbol des aktuellen Zuges (Nichts, Schere, Stein, Papier)
-    private int points;                                                         // Punktzahl des Spielers (über alle Züge)
-    private GameState turnState;                                                // Status des aktuellen Zuges (noch nicht gewählt, gewonnen, verloren, unentschieden)
-    private int opponentIndex;                                                  // Index (für ArrayListe aller Turn-Objekte) des Gegners --> Annahme: Es gibt nur einen Gegner
+    private Player player;                       // Player for this turn 
+    private boolean hasTurnFinished;             // Whether the turn is finished
+    private RockPaperScissorsSymbol turnSymbol;  // Symbol played (rock, paper, scissors)
+    private int points;                          // Points earned
+    private GameState turnState;                 // Status for this round (won, lost, etc.)
+    private int opponentIndex;                   // Index of the opponent's turn object
 
     /**
-     * Gibt den gegnerischen Index zurück
-     * @return Index für ArrayListe
+     * Getter for the opponent's turn index
+     * @return Index of opponent's turn
      */
     public int getOpponentIndex() {
         return opponentIndex;
     }
 
     /**
-     * Setzt gegnerischen Index 
-     * @param opponentIndex Index für ArrayListe
+     * Setter for the opponent's turn index
+     * @param opponentIndex Index of opponent's turn
      */
     public void setOpponentIndex(int opponentIndex) {
         this.opponentIndex = opponentIndex;
     }
 
     /**
-     * Gibt Status des aktuellen Zuges zurück
-     * @return Status des Zuges
+     * Getter for the status
+     * @return Status of the move
      */
     public GameState getTurnState() {
         return turnState;
     }
 
     /**
-     * Setzt Status des aktuellen Zuges
-     * @param turnState Status des Zuges
+     * Setter for the status
+     * @param turnState Status of the move
      */
     public void setTurnState(GameState turnState) {
         this.turnState = turnState;
     }
     
     /**
-     * Überladung: Setzt Status des aktuellen Zuges und zählt Punktzahl hinzu
-     * @param turnState Status des Zuges
-     * @param points Anzahl Punkte, die hinzugezählt werden sollen (i.d. Regel 0 oder 1)
+     * Setter for the status and adds points to current point total
+     * @param turnState Status of the move
+     * @param points Number of points to add to the total (usually 0 or 1)
      */
     public void setTurnState(GameState turnState, int points) {
         this.turnState = turnState;
@@ -62,68 +58,66 @@ public class RockPaperScissorsTurn {
     }
 
     /**
-     * Gibt Spieler des Zuges zurück                                            // Nur get-Methode, da Payer nicht mehr geändert werden soll. Wird in Konstruktor einmalig übergeben
-     * @return Player-Objekt
+     * Getter for player
+     * @return Player-Object
      */
     public Player getPlayer() {
         return player;
     }
 
     /**
-     * Gibt zurück, ob Zug beendet wurde
-     * @return true, wenn Zug beendet wurde, ansonsten false
+     * Getter for turn-finished
+     * @return true if the turn is finished
      */
     public boolean hasTurnFinished() {
         return hasTurnFinished;
     }
 
     /**
-     * Setzt, ob Zug beendet wurde
-     * @param hasTurnFinished true, wenn Zug beendet wurde, ansonsten false
+     * Setter for turn-finished
+     * @param hasTurnFinished true if the turn is finished
      */
     public void setTurnFinished(boolean hasTurnFinished) {
         this.hasTurnFinished = hasTurnFinished;
     }
 
-    /**
-     * Gibt das Symbol des aktuellen Zuges zurück
-     * @return Symbol des Zuges
+    /** Getter for selected symbol
+     * @return Selected symbol
      */
     public RockPaperScissorsSymbol getTurnSymbol() {
         return turnSymbol;
     }
 
     /**
-     * Setzt das Symbol des aktuellen Zuges
-     * @param turnSymbol Symbol des Zuges
+     * Setter for selected symbol
+     * @param turnSymbol Selected symbol
      */
     public void setTurnSymbol(RockPaperScissorsSymbol turnSymbol) {
         this.turnSymbol = turnSymbol;
     }
 
     /**
-     * Gibt Punktzahl des Spielers zurück
-     * @return Punktzahl
+     * Getter for points
+     * @return Points
      */
     public int getPoints() {
         return points;
     }
 
     /**
-     * Setzt Punktzahl des Spielers
-     * @param points Punktzahl
+     * Setter for points
+     * @param points Points
      */
     public void setPoints(int points) {
         this.points = points;
     }
     
     /**
-     * Konstruktor mit Übergabe des Spielers
-     * @param player Spieler dieses Objekts 
+     * Constructor, including player info
+     * @param player Player for this turn-object 
      */
-    public RockPaperScissorsTurn(Player player)
-    {
-        this.player = player;                                                   // Setze alle Parameter (folgende Zeilen)
+    public RockPaperScissorsTurn(Player player) {
+        this.player = player;
         this.hasTurnFinished = false;
         this.points = 0;
         this.turnSymbol = RockPaperScissorsSymbol.None;
@@ -131,30 +125,27 @@ public class RockPaperScissorsTurn {
     }
     
     /**
-     * Methode bereitet alles für nächsten Zug vor
+     * Prepare for the next turn
      */
-    public void nextTurn()
-    {
-        this.hasTurnFinished = false;                                           // Setzte beendet auf false
-        this.turnSymbol = RockPaperScissorsSymbol.None;                         // Setze Symbol auf nichts ausgewählt
-        this.turnState = GameState.None;                                        // Setze Status auf nicht definiert
+    public void nextTurn() {
+        this.hasTurnFinished = false;
+        this.turnSymbol = RockPaperScissorsSymbol.None;
+        this.turnState = GameState.None;
     }
     
     /**
-     * Gibt den Namen des Spielers zurück (Abkürzung)
-     * @return Spielername aus Player-Objekt
+     * Getter for player name (shortcut)
+     * @return Player name from player-object
      */
-    public String getPlayerName()
-    {
+    public String getPlayerName() {
         return this.player.getName();
     }
     
     /**
-     * Gibt die ID des Spielers zurück (Abkürzung)
-     * @return ID aus Player-Objekt
+     * Getter for player ID (shortcut)
+     * @return ID from player-object
      */
-    public int getPlayerID()
-    {
+    public int getPlayerID() {
         return this.player.getId();
     }
 }

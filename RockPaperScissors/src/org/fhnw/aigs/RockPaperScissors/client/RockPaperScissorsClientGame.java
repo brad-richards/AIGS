@@ -10,20 +10,13 @@ import org.fhnw.aigs.commons.communication.GameStartMessage;
 import org.fhnw.aigs.commons.communication.Message;
 
 /**
- * Klasse zur Abbildung der Clientseitigen Logik.<br>
- * Abgeleitet von ClientGame aus dem AIGS BaseClient<br>
- * v1.0 Initial release<br>
- * v1.0.1 Minor chamnges due to dependencies
- * @author Raphael Stoeckli
- * @version v1.0.1
+ * Class to handle client-side game processing, and process messages from the server
  */
-public class RockPaperScissorsClientGame extends ClientGame{
-    
-    // VARIBELDEFINITIONEN
-    private RockPaperScissorsBoard clientBoard;                                 // Definition des Spielfeldes
+public class RockPaperScissorsClientGame extends ClientGame {
+    private RockPaperScissorsBoard clientBoard;  // Reference to the GUI
 
     /**
-     * Gibt das zugehörige Spielfeld zurück
+     * Getter for clientBoard
      * @return RockPaperScissorsBoard-Objekt
      */
     public RockPaperScissorsBoard getClientBoard() {
@@ -31,7 +24,7 @@ public class RockPaperScissorsClientGame extends ClientGame{
     }
 
     /**
-     * Setzt das zugehörige Spielfeld
+     * Setter for clientBoard
      * @param clientBoard RockPaperScissorsBoard-Objekt
      */
     public void setClientBoard(RockPaperScissorsBoard clientBoard) {
@@ -39,63 +32,56 @@ public class RockPaperScissorsClientGame extends ClientGame{
     }
     
     /**
-     * Konstruktor mit Argumenten
-     * @param gameName Name des Spiels
-     * @param mode GameModus (SinglePlayer, MultiPlayer)
-     * @param version Versiond es Programms
+     * Constructor called to create a new game instance; everything is
+     * handled by the constructor in the superclass
+     * @param gameName Name of the game
+     * @param mode GameMode (SinglePlayer, MultiPlayer)
+     * @param version Program version
      */
     public RockPaperScissorsClientGame(String gameName, String version, GameMode mode)
     {
-        // WICHTIG - Aufruf der Super-Klasse
-        super(gameName, version, mode);                                          // Rufe Konstruktor von Super-Klasse auf: Name, Version (optional), Game Mode
+        super(gameName, version, mode);
     }
 
-    
     /**
-     * Methode verarbeitet die Nachrichten vom Server
-     * @param message Nachricht vom Server. Nachrichten müssen als von Message abgeleitete Klassen im Package commons vorhanden sein
+     * Process server messages
+     * @param message Message from the server; this must be one of
+     * the messages defined in the commons pachage
      */
-    @Override                                                                   // Implementiert Methode
+    @Override
     public void processGameLogic(Message message) {
-        if (message instanceof GameStartMessage) {                              // Wenn message vom Typ GameStartMessage ist...
-            gameWindow.fadeOutOverlay();                                        // Warte-Bildschirm ausbelnden (Spielfeld wird sichtbar)
-        }
-        else if (message instanceof RockPaperScissorsParticipantsMessage)       // Wenn message vom Typ RockPaperScissorsParticipantsMessage ist...
-        {
-            RockPaperScissorsParticipantsMessage msg = (RockPaperScissorsParticipantsMessage)message; // Casten ins richtige Format
-            if (msg.getPlayerOne().getName().equals(player.getName()))          // Wenn der Name des übergebenen Spielers eins der eigene Name ist...
-            {
-                clientBoard.manilupateText(msg.getPlayerTwo().getName(), 0, 0); // Name des Gegners auf dem Spielfeld eintragen
+        if (message instanceof GameStartMessage) {
+            gameWindow.fadeOutOverlay();  // Fade in the game board
+        } else if (message instanceof RockPaperScissorsParticipantsMessage) {
+        	// Set opponent's name, and the header
+            RockPaperScissorsParticipantsMessage msg = (RockPaperScissorsParticipantsMessage)message;
+            if (msg.getPlayerOne().getName().equals(player.getName())) {
+                clientBoard.setNamesAndPoints(msg.getPlayerTwo().getName(), 0, 0); 
+            } else {
+               clientBoard.setNamesAndPoints(msg.getPlayerOne().getName(), 0, 0);
             }
-            else                                                                // ...sonst
-            {
-               clientBoard.manilupateText(msg.getPlayerOne().getName(), 0, 0);  // Name des Gegners auf dem Spielfeld eintragen
-            }
-            clientBoard.manipulateHeader("Warte auf Zug von Gegenspieler...");  // Text in Header anpassen
-        }
-        else if (message instanceof RockPaperScissorsResultMessage){            // Wenn message vom Typ RockPaperScissorsResultMessage ist...
-             clientBoard.manipulateHeader("Zug wurde beendet");
-             RockPaperScissorsResultMessage result = (RockPaperScissorsResultMessage)message;  // Caste ins richtige Format
-                                                                                // Manipulieren der Bilder und Texte auf dem Spielfeld
-             clientBoard.manipulateGUI(result.getOpponentSymbol(), result.getMyState(), result.getMySymbol(), result.getOpponentName(), result.getOpponentPoints(), result.getMyPoints());
-             clientBoard.nextTurn(result.getTurnMessage(), result.isIsLastTurn()); // Vorbereiten des Spielfledes auf nächsten Zug
-         }
-        else if (message instanceof GameEndsMessage) {                          // Wenn message vom Typ GameEndsMessage ist...
-            setNoInteractionAllowed(true);                                      // Sperre alle Eingaben (Verhindert Probleme auf Client und Server etc.)
-            GameEndsMessage gameEndMessage = (GameEndsMessage) message;         // Caste ins richtige Format
-            JOptionPane.showMessageDialog(null, gameEndMessage.getReason(), "Game ends", JOptionPane.INFORMATION_MESSAGE); // Gebe Gewinner und letzte Meldung des Spiels aus
-            System.exit(0);                                                     // Programm beenden
+            clientBoard.setHeader("Waiting for opponent's move...");
+        } else if (message instanceof RockPaperScissorsResultMessage) {
+        	// Update the GUI to reflect move result; prepare for next round
+            clientBoard.setHeader("Move is finished");
+            RockPaperScissorsResultMessage result = (RockPaperScissorsResultMessage) message;
+            clientBoard.updateGUI(result.getOpponentSymbol(), result.getMyState(), result.getMySymbol(), result.getOpponentName(), result.getOpponentPoints(), result.getMyPoints());
+            clientBoard.nextTurn(result.getTurnMessage(), result.isIsLastTurn());
+        } else if (message instanceof GameEndsMessage) {  // Standard message from AIGS commons
+        	// Disable GUI, display end-of-game dialog, end program
+            setNoInteractionAllowed(true);
+            GameEndsMessage gameEndMessage = (GameEndsMessage) message;
+            JOptionPane.showMessageDialog(null, gameEndMessage.getReason(), "Game ends", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
         }
     }
 
     /**
-     * Methode wird ausgeführt, sobald das Spiel startklar ist
+     * Called when the game is ready to start
      */
-    @Override                                                                   // Impementierte Methode
+    @Override
     public void onGameReady() {
-        // WICHTIG - Wird dieser Aufruf nicht gemacht, startet das Spiel nicht
-        startGame();                                                            // Startet Spiel über Methode der Super-Klasse
-        clientBoard.manipulateHeader("Warte auf Gegenspieler...");              // Text in Header anpassen
-    }
-    
+        startGame();
+        clientBoard.setHeader("Waiting for opponent's move...");
+    }    
 }

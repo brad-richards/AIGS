@@ -1,0 +1,1 @@
+This folder contains game projects for the auto-compiling function of the AIGS server

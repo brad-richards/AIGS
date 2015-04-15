@@ -7,6 +7,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -22,6 +24,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import org.fhnw.aigs.server.common.LogRouter;
 import org.fhnw.aigs.server.common.LoggingStyle;
 import org.fhnw.aigs.server.common.LoggingThreshold;
@@ -32,9 +36,10 @@ import org.fhnw.aigs.server.common.ServerConfiguration;
  * This class represents a window to manage the server settings. These settings 
  * will be stored in {@link ServerConfiguration#instance}<br>
  * v1.0 Initial release<br>
- * v1.1 Functional changes (added fields / removed fields)
+ * v1.1 Functional changes (added fields / removed fields)<br>
+ * v1.2 Changing look&amp;feel to 'Nimbus' (Platform independent)
  * @author Raphael Stoeckli (24.02.2015)
- * @version 1.1
+ * @version 1.2 (Raphael Stoeckli (13.04.2015)
  */
 public class SettingsWindow extends JDialog{ 
         
@@ -61,6 +66,8 @@ public class SettingsWindow extends JDialog{
      */
     public SettingsWindow()
     {
+        setLookAndFeel("Nimbus"); // Tested: "Nimbus", "Windows"
+        
         ImageIcon logoImage = new ImageIcon(getClass().getResource("/imgs/logo24px.png"));
         this.setIconImage(logoImage.getImage());
         this.setLocationByPlatform(true); // Better positioning of the window
@@ -69,9 +76,42 @@ public class SettingsWindow extends JDialog{
         this.setModal(true);
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         this.setTitle("AIGS Server - Settings");
-        this.setPreferredSize(new java.awt.Dimension(720, 360));
+        this.setPreferredSize(new java.awt.Dimension(800, 430)); // Change this in case of different look&feels
         init();
         loadSettings();
+    }
+    
+    /**
+     * Method to set a specific look and feel (Swing). If the name is not found, {@link javax.swing.UIManager#getCrossPlatformLookAndFeelClassName()} will be used.<br>
+     * This may cause problems with the window and font sizes.
+     * @param name Name of the look and feel theme
+     * @since v1.2
+     */
+    private void setLookAndFeel(String name)
+    {
+        boolean match = false;
+        try {
+         for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+             if (name.equals(info.getName())) {
+                 UIManager.setLookAndFeel(info.getClassName());
+                 match = true;
+                 break;
+             }
+         }
+     } catch (Exception e) {
+         match = false;
+     }
+        if (match == false)
+        {
+            try
+            {
+                UIManager.setLookAndFeel(javax.swing.UIManager.getCrossPlatformLookAndFeelClassName());
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SettingsWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
     }
     
     /**

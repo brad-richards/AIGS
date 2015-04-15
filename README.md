@@ -1,6 +1,8 @@
-AIGS
+AIGS: AI Game Server
 ====
 
-FHNW Projekt: AI Game Server
+This is a project of the [University of Applied Sciences, Northwestern Switzerland (FHNW)](http://www.fhnw.ch/), and is used in programming classes in [Business Information Technology](http://www.fhnw.ch/business/wi/course-content-and-profile).
 
-This README, as well as the Wiki and the Website, are currently empty. To get started with AIGS, please start with the tutorial (in the corresponding directory). The tutorial is currently only available in German.
+Please refer to the [Wiki](https://github.com/brad-richards/AIGS/wiki) for information about this project.
+
+Additional documentation (mostly in German) can be found in the Documentation directory of the project.

@@ -16,10 +16,11 @@ import javafx.scene.text.Font;
  * and a status which can be defined with the method
  * {@link BaseHeader#setStatusLabelText(java.lang.String)}.<br>
  * v1.0 Initial Release<br>
- * v1.1 Changes of teh UI
- * v1.1.1 Minor changes of the UI (tool tips)
+ * v1.1 Changes of teh UI<br>
+ * v1.1.1 Minor changes of the UI (tool tips)<br>
+ * v1.2 Changes of layer handling
  * @author Matthias Stöckli (v1.0)
- * @version v1.1.1 (Raphael Stoeckli, 23.10.2014)
+ * @version v1.2 (Raphael Stoeckli, 23.04.2015)
  */
 public class BaseHeader extends GridPane {
 
@@ -33,6 +34,7 @@ public class BaseHeader extends GridPane {
      * @param gameName The name of the game which will be showed in a label.
      */
     public BaseHeader(String gameName) {
+        this.setId(LayerType.header.toString());                                // Sets the ID as "HEADER"
         gameNameLabel = new Label(gameName);
         statusLabel = new Label();
         settingsButton = new Button();

@@ -15,10 +15,11 @@ import javax.xml.transform.stream.*;
  * This class provides XML-centred helper methods.<br>
  * v1.0 Initial release<br>
  * v1.1 Added some further error handling<br>
- * v1.2 Changing of logging
+ * v1.2 Changing of logging<br>
+ * v1.3 Adding discard option to avoid problems with malformed xml inputs
  *
  * @author Matthias Stöckli (v1.0)
- * @version v1.2 (Raphael Stoeckli, 26.02.2015)
+ * @version v1.3 (Raphael Stoeckli, 21.04.2015)
  */
 public class XMLHelper {
 
@@ -80,9 +81,10 @@ public class XMLHelper {
      * Pretty prints/formats XML. Inspired by "zerix". See
      * http://www.tutorials.de/java/276286-xmlstring-xml-format-ausgeben-lassen.html
      * @return returns formated XML string
-     * @param uglyXml Unformatted XML input.
+     * @param inputString Unformatted XML input or plain text (must be discarded).
+     * @param discardTransformationErrors If true, transformation errors are discarded and the input string is passed as output
      */
-    public static String prettyPrintXml(String uglyXml) {
+    public static String prettyPrintXml(String inputString, boolean discardTransformationErrors) {
         try {
             StringWriter writer = new StringWriter();
 
@@ -90,7 +92,7 @@ public class XMLHelper {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputPropertiesFactory.S_KEY_INDENT_AMOUNT, "1");
-            transformer.transform(new StreamSource(new StringReader(uglyXml)),
+            transformer.transform(new StreamSource(new StringReader(inputString)),
                     new StreamResult(writer));
             StringBuffer buffer = writer.getBuffer();
             return buffer.toString();
@@ -99,7 +101,14 @@ public class XMLHelper {
             LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
         } catch (TransformerException ex) {
             //Logger.getLogger(XMLHelper.class.getName()).log(Level.SEVERE, null, ex);
-            LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
+            if (discardTransformationErrors == true)
+            {
+                return inputString;
+            }
+            else
+            {
+                LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, null, ex);
+            }
         }
         catch (Exception ex) // All other exceptions
         {
@@ -107,6 +116,18 @@ public class XMLHelper {
             LogRouter.log(XMLHelper.class.getName(), Level.SEVERE, "An unknown error occured.", ex);
         }
         return "";
+    }
+    
+      /**
+     * Pretty prints/formats XML. Inspired by "zerix". See
+     * http://www.tutorials.de/java/276286-xmlstring-xml-format-ausgeben-lassen.html
+     * @return returns formated XML string
+     * @param inputString Unformatted XML input. Plain text will throw an exception. <br>Use {@link XMLHelper#prettyPrintXml(java.lang.String, boolean) } to handle plain text.
+     * @since v1.3
+     */  
+    public static String prettyPrintXml(String inputString)
+    {
+        return XMLHelper.prettyPrintXml(inputString, false);
     }
 
     /**

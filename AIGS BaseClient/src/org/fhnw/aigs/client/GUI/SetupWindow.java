@@ -27,8 +27,9 @@ import org.fhnw.aigs.commons.JoinType;
  * be created, if no wating game is present on the server. If a party is startet,
  * it can be defined whether this party is publicly available or private.<br>
  * v1.0 Initial release<br>
- * v1.0.1 Typos 
- * @version v1.0.1 (Raphael Stoeckli, 13.04.2015)
+ * v1.0.1 Typos <br>
+ * v1.1 Changes of layer handling
+ * @version v1.1 (Raphael Stoeckli, 23.04.2015)
  * @author Raphael Stoeckli
  */
 public class SetupWindow extends BorderPane{
@@ -44,10 +45,12 @@ public class SetupWindow extends BorderPane{
      * @param clientGame The ClientGame object of the game
      */
     public SetupWindow(ClientGame clientGame) {
+        this.setId(LayerType.setup.toString());                                 // Sets the ID as "SETUP"
         this.clientGame = clientGame;
         
         if (Settings.getInstance().getAutoConnect() == true)                    // Automatically connect to a random game
         {
+            this.setId(LayerType.setup.toString());                             // Sets the ID as "SETUP"
             init();
             String player = Settings.getInstance().getDisplayname();
             if (player.length() < 1)
@@ -72,7 +75,6 @@ public class SetupWindow extends BorderPane{
         {
            init();         
         }
-        
     }
     
     /**

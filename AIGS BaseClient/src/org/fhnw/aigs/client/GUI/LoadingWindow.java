@@ -13,9 +13,11 @@ import javafx.scene.text.TextAlignment;
 /**
  * This screen can be used to inform the user about the fact that there is
  * either no player to join the game with or that the connection has not been
- * established yet.
- * @version v1.0
- * @author Matthias Stöckli
+ * established yet.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Changes of layer handling
+ * @version v1.1 (Raphael Stoeckli, 23.04.2015) 
+ * @author Matthias Stöckli (v1.0)
  */
 public class LoadingWindow extends BorderPane {
 
@@ -30,6 +32,7 @@ public class LoadingWindow extends BorderPane {
      * connection has been established.
      */
     public LoadingWindow() {
+        this.setId(LayerType.loading.toString());                               // Sets the ID as "LOADING"
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setPrefSize(120, 120);
         progressIndicator.setMaxSize(120, 120);

@@ -13,9 +13,11 @@ import org.fhnw.aigs.commons.XMLHelper;
 /**
  * Class to manage the server-side logging. It supersede standard logging for better control of the formats, outputs and levels of the logs.<br>
  * The class uses the Java SE standard logger in the backend.<br>
- * Possible log levels are Severe, Warning, System (messages of the AIGS server), Game (messages of AIGS games on the server) and Info.
- * @version 1.0
- * @author Raphael Stoeckli (26.02.2015)
+ * Possible log levels are Severe, Warning, System (messages of the AIGS server), Game (messages of AIGS games on the server) and Info.<br>
+ * v1.0 Inital release<br>
+ * v1.1 Fixed issues with malformed input for the xml logger
+ * @version 1.1
+ * @author Raphael Stoeckli (23.04.2015)
  */
 public class LogRouter {
     
@@ -527,7 +529,7 @@ public class LogRouter {
         }
         else
         {
-            return XMLHelper.prettyPrintXml(input);
+            return XMLHelper.prettyPrintXml(input, true); // Discard transformation errors and return plain text
         }     
     }
     

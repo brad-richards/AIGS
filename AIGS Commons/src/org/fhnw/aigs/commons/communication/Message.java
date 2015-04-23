@@ -45,9 +45,10 @@ import org.fhnw.aigs.commons.XMLHelper;
  * form.</li></ul><br>
  * v1.0 Initial release<br>
  * v1.1 Functional changes<br>
- * v1.2 Changing of logging
+ * v1.2 Changing of logging<br>
+ * v1.3 Fixed issues with malformed input for the xml logger
  * @author Matthias Stöckli (v1.0)
- * @version 1.2 (Raphael Stoeckli, 26.02.2015)
+ * @version 1.3 (Raphael Stoeckli, 23.04.2015)
  */
 public abstract class Message {
 
@@ -123,7 +124,7 @@ public abstract class Message {
                 writer.println(xmlString);
                 writer.flush();
                 //Logger.getLogger(Message.class.getName()).log(Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString));
-                LogRouter.log(Message.class.getName(), Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString));
+                LogRouter.log(Message.class.getName(), Level.INFO, "=> \n {0}", XMLHelper.prettyPrintXml(xmlString, false));
                 processingError = false;
                 break;
 

@@ -33,15 +33,18 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
+        
+        // Create a root BaseGameWindow which shows a header, a footer and a
+        // content area. Reference a css layout file  and set the
+        // title.
+        BaseGameWindow root = new BaseGameWindow(primaryStage, "Minesweeper");
+        root.getStylesheets().add("/Assets/Stylesheets/minesweeper.css");
+        
         // Create a new ClientGame, set a title (will be used to identify the game)
         // and set the GameMode
         MinesweeperClientGame minesweeperClientGame = new MinesweeperClientGame(
                 "Minesweeper", GameMode.SinglePlayer, xFields, yFields, totalMines); // VERY IMPORTANT! The game name must be unique on the server (only onece 'Minesweeper')
 
-        // Create a root BaseGameWindow which shows a header, a footer and a
-        // content area. Reference a css layout file  and set the
-        // title.
-        BaseGameWindow root = new BaseGameWindow(primaryStage,"/Assets/Stylesheets/minesweeper.css", "Minesweeper");
 //      primaryStage.setTitle("Minesweeper");
 //      primaryStage.show(); // Show the window
 

@@ -34,10 +34,11 @@ import org.fhnw.aigs.client.gameHandling.ClientGame;
  * any functionality in the base client.</li>
  * </ul><br>
  * v1.0 Initial release<br>
- * v1.1 Change of handling and UI improvements
+ * v1.1 Change of handling and UI improvements<br>
+ * v1.2 Changes of layer handling
  *
  * @author Matthias Stöckli (v1.0)
- * @version v1.1 (Raphael Stoeckli, 22.10.2014)
+ * @version v1.2 (Raphael Stoeckli, 23.04.2014)
  */
 public class BaseGameWindow extends GridPane {
 
@@ -297,7 +298,7 @@ public class BaseGameWindow extends GridPane {
         }
         this.setContent(content);
         Settings.tryLoadSettings(true);                                         // Open Settings window, if defined
-        this.setOverlay(new SetupWindow(clientGame),true);
+        this.setOverlay(new SetupWindow(clientGame),true, true);
         this.primaryStage.show();    
    }
     
@@ -305,17 +306,39 @@ public class BaseGameWindow extends GridPane {
      * See {@link BaseGameWindow#overlay}.
      */
     public void setOverlay(Node overlay) {
-        setOverlay(overlay, false);
+        setOverlay(overlay, false, true);
     }
     
     /**
      * See {@link BaseGameWindow#overlay}.
      */
     public void setOverlay(Node overlay, boolean overrideRemoveExistingOverlay) {
-        if (this.overlay != null && overrideRemoveExistingOverlay == false)
+        setOverlay(overlay, overrideRemoveExistingOverlay, true);
+    }    
+    
+    /**
+     * @param distinctLayers If true, all existing overlays with the same ID as the new one will be removed
+     * See {@link BaseGameWindow#overlay}.
+     * @since v1.2
+     */
+    public void setOverlay(Node overlay, boolean overrideRemoveExistingOverlay, boolean distinctLayers) {
+        if (distinctLayers == true)
         {
-            removeOverlay();                                                    // Remove an existing overlay first
+            String id = overlay.getId();
+            if (this.overlay != null)
+            {
+                removeOverlay(id);                                              // Remove all overlays with the id of the new layer firs (distinct)
+            }
         }
+        else
+        {
+            if (this.overlay != null && overrideRemoveExistingOverlay == false)
+            {
+                removeOverlay();                                                // Remove an existing (top) overlay first
+            }            
+        }
+        
+
         this.overlay = overlay;
         try {
             this.add(overlay, 1, 1);
@@ -324,6 +347,7 @@ public class BaseGameWindow extends GridPane {
         overlay.toFront();
         content = null;
     }
+    
     
     /**
      * Removes the top layer of the overlay. Use this method if joining or 
@@ -341,6 +365,26 @@ public class BaseGameWindow extends GridPane {
         catch (Exception e)
         {
             
+        }
+    }
+    
+    /**
+     * Remove all layers with the specified ID. Uste this Method to avoid double defined layers.<br>
+     * Do not use it to start the party. Use then {@link BaseGameWindow#fadeOutOverlay()} instead.
+     * See {@link BaseGameWindow#overlay}.
+     * @since v1.2
+     * @param id ID(s) to remove
+     */
+    private void removeOverlay(String id)
+    {
+        int length = this.getChildren().size();
+        for(int i = length - 1; i >= 0; i-- ) // Inverse i to avoid unwanted shifting while removing
+        {
+            if (this.getChildren().get(i).getId() == null) { continue; } // Skip unnamed layers
+            if (this.getChildren().get(i).getId().equals(id))
+            {
+                this.getChildren().remove(i);
+            }
         }
     }
 

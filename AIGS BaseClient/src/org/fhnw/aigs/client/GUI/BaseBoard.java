@@ -21,10 +21,11 @@ import org.fhnw.aigs.commons.communication.Message;
  * abstract class.<br>
  * Please note: The BaseBoard is designed with square-shaped boards in mind.
  * While it is possible to use other ratios, it will result in distortet
- * graphics.
- *
- * @author Matthias Stöckli
- * @version v1.0
+ * graphics.<br>
+ * v1.0 Initial release<br>
+ * v1.1 Changes of layer handling
+ * @version v1.1 (Raphael Stoeckli, 23.04.2015) 
+ * @author Matthias Stöckli (v1.0)
  */
 public abstract class BaseBoard extends GridPane {
 
@@ -54,6 +55,7 @@ public abstract class BaseBoard extends GridPane {
      * between GUI and game.
      */
     public BaseBoard(int fieldsX, int fieldsY, ClientGame clientGame) {
+        this.setId(LayerType.board.toString());                                 // Sets the ID as "BOARD"
         this.fieldsX = fieldsX;
         this.fieldsY = fieldsY;
         this.fieldPanes = new Pane[fieldsX][fieldsY];

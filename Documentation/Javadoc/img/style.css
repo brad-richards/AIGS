@@ -1,9 +1,9 @@
 body { font-family:sans-serif}
-.tab1 { width:100%; border-style:solid; border-width:2px; }
+.tab1 { width:100%; border-style:solid; border-width:2px; border-radius:8px;}
 .tab1 tr { width:100%;}
 .tab1 td { text-align:center;}
 .hImg { height:35px; }
 .tab2 { width:100%; border-collapse: collapse;}
-.tab2 th { background-color:lightgray}
-.tab2  td,th { border-style:solid; border-width:2px;}
+.tab2 th { background-color:lightgray; }
+.tab2  td,th { border-style:solid; border-width:2px; padding:5px;}
 .footer { font-size:8pt; font-style:italic;}

@@ -5,71 +5,66 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fhnw.aigs.commons.communication.Message;
 
 /**
- * Klasse zur Mitteilung des Servers an einen Client, wie das Resultat eines Zuges ist.<br>
- * Das resultat ist immer aus der Sicht des jeweiligen Clients. Die selbe Nachricht darf also nicht an alle Clients gesendet, sondern muss pro Client definiert werden.
- * Aus Message abgeleitete Klasse.
- * @author Raphael Stoeckli
- * @version v1.0
+ * Class used by the server to inform the client of the result of a move.
+ * The result is from the point-of-view of the specific client; each client receives a different message.
  */
-@XmlRootElement(name = "RockPaperScissorsResultMessage")                        // Stellt sicher, dass Daten aus dieser Klasse korrekt in XML umgesetzt und versendet werden können (Kommunikation)
+@XmlRootElement(name = "RockPaperScissorsResultMessage")
 public class RockPaperScissorsResultMessage extends Message {
-    
-    // VARIBELDEFINITIONEN    
-    private RockPaperScissorsSymbol mySymbol;                                   // Selbst gewähltes Symbol
-    private RockPaperScissorsSymbol opponentSymbol;                             // Symbol des Gegners
-    private int turn;                                                           // Nummer des Zuges (i.d. Regel zwischen 1 bis 3)
-    private int myPoints;                                                       // Eigene Punktzahl (wird nicht auf Client gespeichert)
-    private int opponentPoints;                                                 // Punktzahl des Gegners
-    private String opponentName;                                                // Name des Gegners (Wird benötigt um den String 'Name: Punkzahl' unkomliziert zusammenzubauen)
-    private boolean isLastTurn;                                                 // Angabe, ob es sich um den letzten Zug der Partie gehandelt hat
-    private String turnMessage;                                                 // Nachricht zum Verlauf des Zuges (z.B. "Schere schlägt Papier. Player1 gewinnt!")
-    private GameState myState;                                                  // Eiegner Status (gewonnen, Verloren oder unentschieden). Der Status des Gegeners kann daraus abgeleitet werden
+    private RockPaperScissorsSymbol mySymbol;		// Symbol for our moves
+    private RockPaperScissorsSymbol opponentSymbol;	// Opponent's symbol
+    private int turn;								// Turn number (1, 2, ...)
+    private int myPoints;							// Our points
+    private int opponentPoints;						// Opponent's points
+    private String opponentName;					// Opponent's name
+    private boolean isLastTurn;						// Last turn = game over?
+    private String turnMessage;						// Result message
+    private GameState myState;						// Our status
     
     /**
-     * Gibt eiegnes Symbol zurück
-     * @return Symbol-Objekt
+     * Returns our symbol
+     * @return Symbol-Object
      */
-    @XmlElement(name = "MySymbol")                                              // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "MySymbol")		// Parameter name for XML must be specified for the getter
     public RockPaperScissorsSymbol getMySymbol() {
         return mySymbol;
     }
 
     /**
-     * Setzt eigenes Symbol
-     * @param mySymbol Symbol-Objekt
+     * Set our symbol
+     * @param mySymbol Symbol-Object
      */
     public void setMySymbol(RockPaperScissorsSymbol mySymbol) {
         this.mySymbol = mySymbol;
     }
 
     /**
-     * Gibt Symbol des Gegners zurück
-     * @return Symbol-Objekt
+     * Get opponent's symbol
+     * @return Symbol-Object
      */
-    @XmlElement(name = "OpponentSymbol")                                        // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)    
+    @XmlElement(name = "OpponentSymbol")		// Parameter name for XML must be specified for the getter    
     public RockPaperScissorsSymbol getOpponentSymbol() {
         return opponentSymbol;
     }
 
     /**
-     * Setzt Symbol des Gegners
-     * @param opponentSymbol Symbol-Objekt
+     * Set opponent's symbol
+     * @param opponentSymbol Symbol-Object
      */
     public void setOpponentSymbol(RockPaperScissorsSymbol opponentSymbol) {
         this.opponentSymbol = opponentSymbol;
     }
 
     /**
-     * Gibt eigene Punktzahl zurück
+     * Get our points
      * @return Punktzahl
      */
-    @XmlElement(name = "MyPoints")                                              // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "MyPoints")		// Parameter name for XML must be specified for the getter
     public int getMyPoints() {
         return myPoints;
     }
 
     /**
-     * Setzt eigene Punktzahl
+     * Set our points
      * @param myPoints Punktzahl
      */
     public void setMyPoints(int myPoints) {
@@ -77,16 +72,16 @@ public class RockPaperScissorsResultMessage extends Message {
     }
 
     /**
-     * Gibt Punktzahl des Gegners zurück
+     * Get opponent's points
      * @return Punktzahl
      */
-    @XmlElement(name = "OpponentPoints")                                        // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "OpponentPoints")		// Parameter name for XML must be specified for the getter
     public int getOpponentPoints() {
         return opponentPoints;
     }
 
     /**
-     * Setzt Punktzahl des Gegners
+     * Set opponent's points
      * @param opponentPoints Punktzahl
      */
     public void setOpponentPoints(int opponentPoints) {
@@ -94,113 +89,110 @@ public class RockPaperScissorsResultMessage extends Message {
     }
 
     /**
-     * Gibt Name des Gegners zurück
-     * @return Name von Gegner
+     * Get opponent's name
+     * @return Name of opponent
      */
-    @XmlElement(name = "OpponentName")                                          // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "OpponentName")		// Parameter name for XML must be specified for the getter
     public String getOpponentName() {
         return opponentName;
     }
 
     /**
-     * Setzt Name des Gegners
-     * @param opponentName Name von Gegner
+     * Set opponent's name
+     * @param opponentName Name of opponent
      */
     public void setOpponentName(String opponentName) {
         this.opponentName = opponentName;
     }
 
     /**
-     * Gibt eigenen Status (Gewonnen, Verloren, Unentschieden) zurück
-     * @return GameState-Objekt
+     * Get our status (won, lost, etc.)
+     * @return GameState-Object
      */
-    @XmlElement(name = "MyState")                                               // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "MyState")		// Parameter name for XML must be specified for the getter
     public GameState getMyState() {
         return myState;
     }
 
     /**
-     * Setzt eigenen Status (Gewonnen, Verloren, Unentschieden)
-     * @param state GameState-Objekt
+     * Set out status (won, lost, etc.)
+     * @param state GameState-Object
      */
     public void setMyState (GameState state) {
         this.myState = state;
     }
 
     /**
-     * Gibt Nachricht zum Zug zurück
-     * @return Nachricht
+     * Get result message
+     * @return Message
      */
-    @XmlElement(name = "TurnMessage")                                           // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "TurnMessage")		// Parameter name for XML must be specified for the getter
     public String getTurnMessage() {
         return turnMessage;
     }
 
     /**
-     * Setzt Nachricht zum Zug
-     * @param turnMessage Nachricht
+     * Set result message
+     * @param turnMessage Message
      */
     public void setTurnMessage(String turnMessage) {
         this.turnMessage = turnMessage;
     }
     
     /**
-     * Gibt zurück, ob es sich um den letzten Zug der Partie handelt
-     * @return true, falls es der letzte Zug ist, ansonsten false
+     * Get boolean: was this the last move?
+     * @return true, if this was the last move
      */
-    @XmlElement(name = "IsLastTurn")                                            // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "IsLastTurn")		// Parameter name for XML must be specified for the getter
     public boolean isIsLastTurn() {
         return isLastTurn;
     }
 
     /**
-     * Setzt, ob es sich um den letzten Zug der Partie handelt
-     * @param isLastTurn true, falls es der letzte Zug ist, ansonsten false
+     * Set boolean: was this the last move?
+     * @param isLastTurn true, if this was the last move
      */
     public void setIsLastTurn(boolean isLastTurn) {
         this.isLastTurn = isLastTurn;
     }
 
     /**
-     * Gibt Nummer des Zuges zurück
-     * @return Nummer
+     * Get turn number
+     * @return Number
      */
-    @XmlElement(name = "Turn")                                                  // Definiert, wie dieser Parameter in XML heissen soll (muss nur bei get-Methode angegeben werden)
+    @XmlElement(name = "Turn")		// Parameter name for XML must be specified for the getter
     public int getTurn() {
         return turn;
     }
 
     /**
-     * Setzt Nummer des Zuges
-     * @param turn Nummer
+     * Set turn number
+     * @param turn Number
      */
     public void setTurn(int turn) {
         this.turn = turn;
     }
     
     /**
-     * Parameterloser konstruktor (wird zwingend benötigt)
+     * Empty constructor (required)
      */
-    RockPaperScissorsResultMessage(){                                           // Keine weiteren Aktionen notwendig
-    }
-    
+    RockPaperScissorsResultMessage() { }
 
     /**
-     * Konstruktor mit Übergabe aller Parameter
-     * @param myState  Eigener Status. Status des Gegners ergibt sich automatisch
-     * @param lastTurn frue, wenn es sich um den letzten Zug der Pertie handelt, ansonsten false 
-     * @param mySymbol Eigenes Symbol
-     * @param opponentSymbol Symbol des Gegners
-     * @param opponentName Name des Gegners
-     * @param myPoints Eigene Punktzahl (Total)
-     * @param opponentPoints Punktzahl des Gegners (Total)
-     * @param turn Nummer des Zuges
-     * @param turnMessage Text, welcher auf den Clients angezeigt werden soll
+     * Constructor with all parameters
+     * @param myState  Our own status
+     * @param lastTurn true, if last turn 
+     * @param mySymbol Our symbol
+     * @param opponentSymbol Opponent's symbol
+     * @param opponentName Opponent's name
+     * @param myPoints Our points
+     * @param opponentPoints Opponent's points
+     * @param turn Turn number
+     * @param turnMessage Result message
      */
-    public RockPaperScissorsResultMessage(GameState myState, boolean lastTurn, RockPaperScissorsSymbol mySymbol, RockPaperScissorsSymbol opponentSymbol, String opponentName, int myPoints, int opponentPoints, int turn, String turnMessage)
-    {
-      super();                                                                  // Initialisieren der Super-Klasse
-      this.setMyState(myState);                                                 // Setzten der Parameter (alle folgenden Zeilen)
+    public RockPaperScissorsResultMessage(GameState myState, boolean lastTurn, RockPaperScissorsSymbol mySymbol, RockPaperScissorsSymbol opponentSymbol, String opponentName, int myPoints, int opponentPoints, int turn, String turnMessage) {
+      super();
+      this.setMyState(myState);
       this.setIsLastTurn(lastTurn);
       this.setMyPoints(myPoints);
       this.setMySymbol(mySymbol);
@@ -210,5 +202,4 @@ public class RockPaperScissorsResultMessage extends Message {
       this.setTurn(turn);
       this.setTurnMessage(turnMessage);
     }
-    
 }
